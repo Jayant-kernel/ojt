@@ -1,0 +1,7 @@
+for back:-
+uvicorn app.main:app --reload --port 8000
+to check:-
+curl http://localhost:8000/health
+
+for front:-
+npm dev run
