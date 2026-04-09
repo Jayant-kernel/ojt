@@ -31,10 +31,14 @@ async def lifespan(app: FastAPI):
     logger.info("🚀 Starting %s v%s", settings.APP_NAME, settings.APP_VERSION)
 
     # In production, use Alembic migrations instead of create_all.
-    # This is kept here for convenience in development / Docker first-run.
-    if settings.DEBUG:
+    # However, we ensure tables and a default user exist for convenience.
+    try:
         await init_db()
-        logger.info("✅ Database tables verified / created")
+        from app.db.session import ensure_admin_user
+        await ensure_admin_user()
+        logger.info("✅ Database initialized and seeded")
+    except Exception as e:
+        logger.error("❌ Database initialization failed: %s", e)
 
     yield  # App is running
 

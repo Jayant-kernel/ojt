@@ -25,7 +25,7 @@ class Base(DeclarativeBase):
 
 # ── Async engine ─────────────────────────────────────────────────────────────
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    settings.ASYNC_DATABASE_URL,
     echo=settings.DEBUG,
     pool_size=10,
     max_overflow=20,
@@ -62,3 +62,24 @@ async def init_db() -> None:
     """Create all tables. Used on startup in development/test."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+
+async def ensure_admin_user() -> None:
+    """Creates a default admin user if none exists."""
+    from sqlalchemy import select
+    from app.models.user import User, UserRole
+    from app.core.security import hash_password
+
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(User).limit(1))
+        if not result.scalars().first():
+            admin = User(
+                email="admin@warehouse.com",
+                full_name="System Administrator",
+                hashed_password=hash_password("password123"),
+                role=UserRole.ADMIN,
+                is_active=True,
+                is_verified=True,
+            )
+            session.add(admin)
+            await session.commit()
