@@ -20,7 +20,7 @@ services:
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: 1440
       - key: BACKEND_CORS_ORIGINS
-        value: '["https://ojt-opal.vercel.app"]'
+        value: '["*"]'
       - key: DEBUG
         value: "false"
       - key: PYTHON_VERSION
