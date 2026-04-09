@@ -28,6 +28,19 @@ export default function LoginPage() {
     }
   }
 
+  const handleGuestLogin = async () => {
+    setLoading(true)
+    try {
+      await login('guest@warehouse.com', 'guestpassword')
+      toast.success('Guest access granted')
+      navigate('/')
+    } catch (err) {
+      toast.error(err.response?.data?.detail ?? 'Guest login failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-ink-950 flex items-center justify-center p-4">
       {/* Background grid */}
@@ -96,6 +109,15 @@ export default function LoginPage() {
               disabled={loading}
             >
               {loading ? 'Authenticating…' : 'Sign In'}
+            </button>
+
+            <button
+              type="button"
+              className="btn-secondary w-full mt-2 py-2.5 flex items-center justify-center gap-2"
+              onClick={handleGuestLogin}
+              disabled={loading}
+            >
+              Sign in as Guest
             </button>
           </form>
         </div>

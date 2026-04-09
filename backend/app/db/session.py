@@ -66,14 +66,15 @@ async def init_db() -> None:
 
 
 async def ensure_admin_user() -> None:
-    """Creates a default admin user if none exists."""
+    """Creates default admin and guest users if they don't exist."""
     from sqlalchemy import select
     from app.models.user import User, UserRole
     from app.core.security import hash_password
 
     async with AsyncSessionLocal() as session:
-        result = await session.execute(select(User).limit(1))
-        if not result.scalars().first():
+        # Check for admin
+        admin_result = await session.execute(select(User).where(User.email == "admin@warehouse.com"))
+        if not admin_result.scalars().first():
             admin = User(
                 email="admin@warehouse.com",
                 full_name="System Administrator",
@@ -83,4 +84,18 @@ async def ensure_admin_user() -> None:
                 is_verified=True,
             )
             session.add(admin)
-            await session.commit()
+
+        # Check for guest
+        guest_result = await session.execute(select(User).where(User.email == "guest@warehouse.com"))
+        if not guest_result.scalars().first():
+            guest = User(
+                email="guest@warehouse.com",
+                full_name="Guest User",
+                hashed_password=hash_password("guestpassword"),
+                role=UserRole.VIEWER,
+                is_active=True,
+                is_verified=True,
+            )
+            session.add(guest)
+
+        await session.commit()
