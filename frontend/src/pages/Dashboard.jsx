@@ -2,7 +2,7 @@
  * Dashboard — KPI cards, sales trend chart, top products, recent alerts.
  * Redesigned to crypto staking aesthetic.
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Package, AlertTriangle, DollarSign, Wallet, TrendingUp, ChevronRight, Activity } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -25,6 +25,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null)
   const [lowStock, setLowStock] = useState([])
   const [loading, setLoading] = useState(true)
+  const [timeRange, setTimeRange] = useState('24H')
 
   useEffect(() => {
     Promise.all([
@@ -55,9 +56,14 @@ export default function Dashboard() {
     toast.success('Alert dismissed')
   }
 
-  // Data for sparklines
-  const sparkline1 = generateSparkline(10, 50, 30) // Inventory value trend
-  const sparkline2 = generateSparkline(10, 20, 10) // Restock rate
+  // Data for sparklines based on timeRange
+  const { sparkline1, sparkline2 } = useMemo(() => {
+    const points = timeRange === '24H' ? 6 : timeRange === '7D' ? 14 : 30
+    return {
+      sparkline1: generateSparkline(points, 50, 30),
+      sparkline2: generateSparkline(points, 20, 10)
+    }
+  }, [timeRange])
 
   return (
     <div className="relative z-0">
@@ -81,9 +87,19 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <h2 className="font-display font-semibold text-xl text-white">Top Inventory Metrics</h2>
         <div className="flex bg-ink-900 border border-white/[0.05] rounded-full p-1 shadow-inner">
-          <button className="px-4 py-1.5 rounded-full bg-white/10 text-white font-mono text-xs shadow-sm">24H</button>
-          <button className="px-4 py-1.5 rounded-full text-steel-400 hover:text-white font-mono text-xs transition-colors">7D</button>
-          <button className="px-4 py-1.5 rounded-full text-steel-400 hover:text-white font-mono text-xs transition-colors">30D</button>
+          {['24H', '7D', '30D'].map((range) => (
+            <button
+              key={range}
+              onClick={() => setTimeRange(range)}
+              className={`px-4 py-1.5 rounded-full font-mono text-xs transition-colors ${
+                timeRange === range
+                  ? 'bg-white/10 text-white shadow-sm'
+                  : 'text-steel-400 hover:text-white'
+              }`}
+            >
+              {range}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -243,6 +259,7 @@ export default function Dashboard() {
           )}
           </div>
         </div>
+      </div>
       </div>
     </div>
   )
