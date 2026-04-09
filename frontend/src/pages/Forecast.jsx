@@ -308,7 +308,7 @@ export default function Forecast() {
                   <select className="input" value={productId} onChange={(e) => setProductId(e.target.value)}>
                     <option value="">Select product…</option>
                     {products.map(p => (
-                      <option key={p.id} value={p.id}>{p.name} ({p.sku})</option>
+                      <option key={p.id} value={p.id}>{p.sku} ({p.name})</option>
                     ))}
                   </select>
                 </Field>

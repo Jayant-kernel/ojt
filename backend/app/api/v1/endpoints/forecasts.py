@@ -60,9 +60,27 @@ async def get_forecast_products():
         return products
 
     try:
+        # Build a name mapping from inventory.csv
+        name_map = {}
+        inv_path = get_csv_path(INVENTORY_PATHS)
+        if inv_path:
+            with open(inv_path, encoding="utf-8") as f:
+                r = csv.DictReader(f)
+                for row in r:
+                    id_val = row.get("Product_ID")
+                    if id_val:
+                        name_map[id_val] = row.get("Product_Name", id_val)
+
         df = pd.read_csv(csv_path)
-        names = sorted(df["product_name"].dropna().unique().tolist())
-        return [{"id": n, "name": n, "sku": n, "category": ""} for n in names]
+        skus = sorted(df["product_name"].dropna().unique().tolist())
+        return [
+            {
+                "id": sku, 
+                "name": name_map.get(sku, sku), 
+                "sku": sku, 
+                "category": ""
+            } for sku in skus
+        ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
