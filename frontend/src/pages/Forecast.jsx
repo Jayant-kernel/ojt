@@ -198,6 +198,7 @@ export default function Forecast() {
   // Drill-down logic
   const [selectedProductForModal, setSelectedProductForModal] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [showAllRows, setShowAllRows] = useState(false)
 
   useEffect(() => {
     productsApi.list({ page_size: 100 })
@@ -544,7 +545,7 @@ export default function Forecast() {
                       </tr>
                     </thead>
                     <tbody>
-                      {dataset.slice(0, 10).map((item, i) => (
+                      {dataset.slice(0, showAllRows ? dataset.length : 10).map((item, i) => (
                         <tr 
                           key={i} 
                           className="table-row cursor-pointer hover:bg-ink-800/50 group transition-all"
@@ -568,10 +569,21 @@ export default function Forecast() {
                       ))}
                     </tbody>
                   </table>
-                  {dataset.length > 10 && (
-                    <p className="text-[10px] text-steel-500 font-mono text-center py-3">
-                      + {dataset.length - 10} more rows…
-                    </p>
+                  {!showAllRows && dataset.length > 10 && (
+                    <button 
+                      onClick={() => setShowAllRows(true)}
+                      className="w-full text-[10px] text-steel-500 hover:text-amber-400 font-mono text-center py-4 bg-ink-950/20 hover:bg-ink-900/40 transition-all border-t border-white/5 uppercase tracking-widest"
+                    >
+                      + {dataset.length - 10} more rows… (Click to reveal all)
+                    </button>
+                  )}
+                  {showAllRows && dataset.length > 10 && (
+                    <button 
+                      onClick={() => setShowAllRows(false)}
+                      className="w-full text-[10px] text-steel-500 hover:text-amber-400 font-mono text-center py-4 bg-ink-950/20 hover:bg-ink-900/40 transition-all border-t border-white/5 uppercase tracking-widest"
+                    >
+                      Collapse list
+                    </button>
                   )}
                 </div>
               </SectionCard>
