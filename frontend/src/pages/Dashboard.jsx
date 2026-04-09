@@ -50,12 +50,22 @@ export default function Dashboard() {
   const fmt = (n) => n?.toLocaleString() ?? '—'
   const fmtCurrency = (n) => n != null ? `₹${n.toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '—'
 
+  const handleDismiss = (id) => {
+    setLowStock((prev) => prev.filter((item) => item.id !== id))
+    toast.success('Alert dismissed')
+  }
+
   // Data for sparklines
   const sparkline1 = generateSparkline(10, 50, 30) // Inventory value trend
   const sparkline2 = generateSparkline(10, 20, 10) // Restock rate
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-[1200px] mx-auto">
+    <div className="relative z-0">
+      {/* Ambient Glassmorphic Glows */}
+      <div className="fixed top-[-10%] left-[10%] w-[500px] h-[500px] bg-primary-600/15 rounded-full blur-[140px] pointer-events-none -z-10 mix-blend-screen" />
+      <div className="fixed bottom-[10%] right-[10%] w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[140px] pointer-events-none -z-10 mix-blend-screen" />
+
+      <div className="space-y-8 animate-fade-in max-w-[1200px] mx-auto pb-12 relative z-10">
       
       {/* Top Header Section */}
       <div className="flex items-center justify-between pb-4 border-b border-white/[0.05]">
@@ -190,7 +200,7 @@ export default function Dashboard() {
               </div>
               
               {lowStock.map((p) => (
-                <div key={p.id} className="list-row flex-col md:flex-row items-start md:items-center gap-4 md:gap-0 bg-ink-900/60 border border-white/[0.04]">
+                <div key={p.id} className="list-row flex-col md:flex-row items-start md:items-center gap-4 md:gap-0 bg-white/[0.03] backdrop-blur-xl border border-white/[0.05] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
                   <div className="w-full md:w-2/5 flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-ink-800 flex items-center justify-center border border-white/[0.08] shrink-0 shadow-inner">
                       <Package size={16} className="text-steel-300" />
@@ -220,7 +230,10 @@ export default function Dashboard() {
                     <button className="bg-primary-500 hover:bg-primary-400 text-white shadow-lg shadow-primary-500/30 text-[10px] uppercase font-display font-bold px-4 py-2 rounded-lg transition-all active:scale-95 border border-primary-400">
                       Order
                     </button>
-                    <button className="bg-transparent hover:bg-white/10 text-steel-300 text-[10px] uppercase font-display font-medium px-4 py-2 rounded-lg border border-white/20 transition-all">
+                    <button 
+                      onClick={() => handleDismiss(p.id)}
+                      className="bg-transparent hover:bg-white/10 text-steel-300 text-[10px] uppercase font-display font-medium px-4 py-2 rounded-lg border border-white/20 transition-all"
+                    >
                       Dismiss
                     </button>
                   </div>
