@@ -107,32 +107,31 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Card 1 */}
-        <div className="card p-6 relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-primary-500 to-transparent opacity-70"></div>
+        <div className="card p-6 relative overflow-hidden group bg-[rgba(60,100,220,0.1)] border-t-[rgba(120,180,255,0.4)]">
           <div className="flex items-center gap-3 mb-6">
-             <div className="w-8 h-8 rounded-full bg-primary-500/10 flex items-center justify-center border border-primary-500/30 shadow-[0_0_10px_rgba(169,85,255,0.15)]">
-               <Package size={14} className="text-primary-400" />
+             <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/30 shadow-[0_0_15px_rgba(100,160,255,0.2)]">
+               <Package size={14} className="text-blue-400" />
              </div>
              <div>
-               <div className="text-[10px] font-mono text-steel-400 uppercase tracking-widest">Total Products</div>
+               <div className="text-[10px] font-mono text-steel uppercase tracking-[0.2em]">Total Products</div>
              </div>
           </div>
           <div className="flex items-end justify-between z-10 relative">
             <div>
-              <div className="font-display font-bold text-3xl text-white mb-2">{fmt(stats?.total_products)}</div>
-              <div className="text-[10px] font-mono text-success flex items-center gap-1"><span className="px-1.5 py-0.5 rounded-sm bg-success/10">+4.2%</span> <TrendingUp size={12} /></div>
+              <div className="font-display font-medium text-4xl text-white mb-2 tracking-tight">{fmt(stats?.total_products)}</div>
+              <div className="text-[10px] font-mono text-success flex items-center gap-1.5"><span className="px-1.5 py-0.5 rounded bg-success/10 border border-success/20">+4.2%</span> <TrendingUp size={12} /></div>
             </div>
             <div className="w-28 h-12">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={sparkline1}>
                    <defs>
                     <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#A955FF" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#A955FF" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#60A5FA" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#60A5FA" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <Tooltip cursor={false} content={<></>} />
-                  <Area type="monotone" dataKey="val" stroke="#A955FF" strokeWidth={2} fill="url(#g1)" dot={false} />
+                  <Area type="monotone" dataKey="val" stroke="#60A5FA" strokeWidth={2} fill="url(#g1)" dot={false} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -140,20 +139,19 @@ export default function Dashboard() {
         </div>
 
         {/* Card 2 */}
-        <div className="card p-6 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-warning to-transparent opacity-70"></div>
+        <div className="card p-6 relative overflow-hidden bg-[rgba(200,140,30,0.08)] border-t-[rgba(245,158,11,0.4)]">
           <div className="flex items-center gap-3 mb-6">
-             <div className="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center border border-warning/30 shadow-[0_0_10px_rgba(245,158,11,0.15)]">
+             <div className="w-8 h-8 rounded-xl bg-warning/10 flex items-center justify-center border border-warning/30 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
                <AlertTriangle size={14} className="text-warning" />
              </div>
              <div>
-               <div className="text-[10px] font-mono text-steel-400 uppercase tracking-widest">Low Stock Alert</div>
+               <div className="text-[10px] font-mono text-steel uppercase tracking-[0.2em]">Low Stock Alert</div>
              </div>
           </div>
           <div className="flex items-end justify-between z-10 relative">
             <div>
-              <div className="font-display font-bold text-3xl text-white mb-2">{fmt(stats?.low_stock_count)}</div>
-              <div className="text-[10px] font-mono text-danger flex items-center gap-1"><span className="px-1.5 py-0.5 rounded-sm bg-danger/10">-1.5%</span> <TrendingUp size={12} className="rotate-180" /></div>
+              <div className="font-display font-medium text-4xl text-white mb-2 tracking-tight">{fmt(stats?.low_stock_count)}</div>
+              <div className="text-[10px] font-mono text-danger flex items-center gap-1.5"><span className="px-1.5 py-0.5 rounded bg-danger/10 border border-danger/20">-1.5%</span> <TrendingUp size={12} className="rotate-180" /></div>
             </div>
             <div className="w-28 h-12">
                <ResponsiveContainer width="100%" height="100%">
@@ -172,94 +170,100 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Card 3 - Replaces Liquid Staking Callout */}
-        <div className="card p-6 relative overflow-hidden bg-gradient-to-br from-[#26174a] to-[#0D0B14] border border-primary-500/20 shadow-2xl">
-           <div className="absolute -top-16 -right-16 w-40 h-40 bg-primary-500 rounded-full blur-[70px] opacity-30"></div>
-           <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-[magenta] rounded-full blur-[80px] opacity-20"></div>
+        {/* Card 3 */}
+        <div className="card p-6 relative overflow-hidden bg-[rgba(100,50,200,0.12)] border-t-[rgba(160,120,255,0.4)] shadow-2xl">
+           <div className="absolute -top-16 -right-16 w-40 h-40 bg-purple-500 rounded-full blur-[80px] opacity-20"></div>
            
            <div className="relative z-10 flex flex-col h-full justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="bg-primary-500 px-2 py-0.5 rounded text-[9px] uppercase font-mono font-bold text-white shadow-md">Summary</div>
+                  <div className="bg-white/10 px-2.5 py-1 rounded text-[9px] uppercase font-mono font-black text-white border border-white/10">Active Audit</div>
                 </div>
-                <h3 className="font-display text-base font-bold text-white mb-1.5 tracking-wide">Inventory Value Portfolio</h3>
-                <p className="text-[11px] text-steel-400 font-mono mb-6 leading-relaxed bg-ink-950/20 p-2 rounded-lg border border-white/5">
-                  Real-time sync of asset value. Total cost base across all units.
+                <h3 className="font-display text-base font-bold text-white mb-2 tracking-wide">Inventory Value Portfolio</h3>
+                <p className="text-[11px] text-steel font-mono mb-6 leading-relaxed bg-white/[0.03] p-3 rounded-xl border border-white/5">
+                  Live valuation across all linked warehouses.
                 </p>
-                <div className="font-display font-bold text-3xl text-white mb-6 drop-shadow-md">
+                <div className="font-display font-black text-4xl text-white mb-8 drop-shadow-2xl">
                   {fmtCurrency(stats?.total_inventory_value)}
                 </div>
               </div>
-              <button className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-mono text-[11px] font-bold uppercase tracking-widest py-3 rounded-xl transition-all hover:shadow-lg flex items-center justify-center gap-2 backdrop-blur-md">
-                View Full Audit <ChevronRight size={14} />
+              <button className="w-full btn-primary gap-2 !py-3">
+                <span className="font-mono text-[11px] font-black tracking-widest uppercase">Inspect Portfolio</span> <ChevronRight size={14} />
               </button>
            </div>
         </div>
 
       </div>
 
-      {/* Lower Section: "Active Stakings" equivalent -> Low Stock Alerts */}
-      <div className="mt-12">
-        <h2 className="font-display font-semibold text-xl text-white mb-6 tracking-wide">Action Needed (Low Stock)</h2>
+      {/* Lower Section: Action Needed */}
+      <div className="mt-12 group/table">
+        <h2 className="font-display font-bold text-2xl text-white mb-8 tracking-tight flex items-center gap-3">
+          <div className="w-1.5 h-8 bg-purple-500 rounded-full shadow-[0_0_15px_rgba(169,85,255,0.5)]" />
+          Action Needed
+        </h2>
         
-        <div className="card p-6">
+        <div className="card overflow-hidden">
            {lowStock.length === 0 ? (
-            <EmptyState icon={Package} message="All products are adequately stocked" />
+            <div className="p-12"><EmptyState icon={Package} message="All systems nominal. No stock alerts detected." /></div>
           ) : (
-            <div className="space-y-3">
-              <div className="list-header hidden md:flex px-4">
-                <div className="w-2/5">Product Detail</div>
-                <div className="w-1/5 text-right">Current Stock</div>
-                <div className="w-1/5 text-right">Reorder Point</div>
-                <div className="w-1/5 text-center">Status</div>
-                <div className="w-1/5 text-right">Actions</div>
+            <div className="">
+              <div className="list-header hidden md:flex border-b border-white/10 bg-white/[0.02] px-8 py-5">
+                <div className="w-2/5">Asset Detail</div>
+                <div className="w-1/5 text-right">Available units</div>
+                <div className="w-1/5 text-right">Threshold</div>
+                <div className="w-1/5 text-center">Protocol Status</div>
+                <div className="w-1/5 text-right">Directives</div>
               </div>
               
-              {lowStock.map((p) => (
-                <div key={p.id} className="list-row flex-col md:flex-row items-start md:items-center gap-4 md:gap-0 bg-white/[0.03] backdrop-blur-xl border border-white/[0.05] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
-                  <div className="w-full md:w-2/5 flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-ink-800 flex items-center justify-center border border-white/[0.08] shrink-0 shadow-inner">
-                      <Package size={16} className="text-steel-300" />
+              <div className="divide-y divide-white/[0.03]">
+                {lowStock.map((p) => (
+                  <div key={p.id} className="list-row flex-col md:flex-row items-start md:items-center gap-4 md:gap-0 px-8 py-6 hover:bg-white/[0.03] transition-colors relative group/row">
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover/row:scale-y-100 transition-transform origin-top" />
+                    
+                    <div className="w-full md:w-2/5 flex items-center gap-5">
+                      <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/10 shrink-0 shadow-inner group-hover/row:border-primary/20 transition-colors">
+                        <Package size={20} className="text-steel group-hover/row:text-primary transition-colors" />
+                      </div>
+                      <div>
+                        <div className="font-display font-bold text-white text-base mb-1">{p.name}</div>
+                        <div className="text-[10px] font-mono text-steel uppercase tracking-[0.2em] font-medium">Ref: {p.sku}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-display font-semibold text-white text-sm mb-0.5">{p.name}</div>
-                      <div className="text-steel-400 text-[10px] font-mono tracking-widest uppercase">SKU: {p.sku}</div>
+                    
+                    <div className="w-full md:w-1/5 md:text-right font-display text-2xl font-black text-white tracking-tighter px-4">
+                      {p.current_stock}
+                    </div>
+                    
+                    <div className="w-full md:w-1/5 md:text-right text-steel font-mono text-xs uppercase tracking-widest px-4 font-bold">
+                      {p.reorder_point ?? '—'}
+                    </div>
+                    
+                    <div className="w-full md:w-1/5 md:text-center px-4">
+                      {p.current_stock === 0
+                        ? <span className="badge-danger">CRITICAL: EMPTY</span>
+                        : <span className="badge-warning">WARNING: DEPLETING</span>
+                      }
+                    </div>
+  
+                    <div className="w-full md:w-1/5 flex justify-start md:justify-end gap-3 px-4">
+                      <button className="btn-primary !px-5 !py-2 text-[11px] font-black uppercase tracking-widest">
+                        Refill
+                      </button>
+                      <button 
+                        onClick={() => handleDismiss(p.id)}
+                        className="btn-ghost !px-4 !py-2 text-[10px] font-bold uppercase tracking-widest text-steel/60 hover:text-white"
+                      >
+                        Ignore
+                      </button>
                     </div>
                   </div>
-                  
-                  <div className="w-full md:w-1/5 md:text-right font-display text-xl font-bold text-white tracking-widest px-4">
-                    {p.current_stock}
-                  </div>
-                  
-                  <div className="w-full md:w-1/5 md:text-right text-steel-400 font-mono text-[11px] uppercase tracking-widest px-4">
-                    {p.reorder_point ?? '—'}
-                  </div>
-                  
-                  <div className="w-full md:w-1/5 md:text-center px-4">
-                    {p.current_stock === 0
-                      ? <span className="badge-danger bg-danger/20">Out of stock</span>
-                      : <span className="badge-warning bg-warning/20">Restock needed</span>
-                    }
-                  </div>
-
-                  <div className="w-full md:w-1/5 flex justify-start md:justify-end gap-2 px-4">
-                    <button className="bg-primary-500/40 backdrop-blur-md hover:bg-primary-500/60 text-white shadow-lg shadow-primary-500/30 text-[10px] uppercase font-display font-bold px-4 py-2 rounded-lg transition-all active:scale-95 border border-primary-400/50">
-                      Order
-                    </button>
-                    <button 
-                      onClick={() => handleDismiss(p.id)}
-                      className="bg-white/5 backdrop-blur-md hover:bg-white/10 text-steel-300 text-[10px] uppercase font-display font-medium px-4 py-2 rounded-lg border border-white/20 transition-all"
-                    >
-                      Dismiss
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
-          </div>
         </div>
       </div>
     </div>
-  )
+  </div>
+)
 }

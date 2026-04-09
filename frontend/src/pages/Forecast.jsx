@@ -61,15 +61,16 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
   const avgSalesValue = sales.length > 0 ? (totalSalesValue / sales.length).toFixed(1) : '0'
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-ink-900 border border-ink-600 rounded-xl w-full max-w-5xl max-h-[95vh] overflow-hidden shadow-2xl animate-scale-up">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-md animate-fade-in shadow-2xl">
+      <div className="card w-full max-w-6xl max-h-[92vh] overflow-hidden flex flex-col relative">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500" />
         {/* Header */}
         <div className="px-6 py-4 border-b border-ink-600 flex items-center justify-between">
           <div>
             <h3 className="text-lg font-display font-bold text-white leading-tight">{product?.name}</h3>
             <p className="text-[10px] font-mono text-steel-400 uppercase tracking-widest">{product?.sku} • {product?.category}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-ink-800 rounded-lg text-steel-400 hover:text-white transition-colors">
+          <button onClick={onClose} className="p-2.5 rounded-xl text-steel hover:text-white hover:bg-white/10 transition-all">
             <X size={20} />
           </button>
         </div>
@@ -77,7 +78,7 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
         {/* Content */}
         <div className="p-6 overflow-y-auto">
           {loading ? (
-            <div className="h-[450px] flex flex-col items-center justify-center gap-3">
+            <div className="min-h-screen flex items-center justify-center">
               <Spinner size={32} />
               <p className="font-mono text-xs text-steel-400">Loading 2025 Weekly Data...</p>
             </div>
@@ -91,7 +92,8 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
                 <div className="absolute inset-y-0 left-0 flex items-center z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => handleScroll('left')}
-                    className="p-2 ml-2 bg-ink-800/80 border border-ink-600 rounded-full text-white hover:bg-amber-400 hover:text-ink-900 transition-all shadow-xl"
+                    className="p-3 ml-2 bg-white/5 border border-white/10 rounded-full text-white hover:bg-blue-500/40 transition-all shadow-2xl backdrop-blur-md"
+                    title="Previous Period"
                   >
                     <ChevronLeft size={20} />
                   </button>
@@ -99,7 +101,8 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
                 <div className="absolute inset-y-0 right-0 flex items-center z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => handleScroll('right')}
-                    className="p-2 mr-2 bg-ink-800/80 border border-ink-600 rounded-full text-white hover:bg-amber-400 hover:text-ink-900 transition-all shadow-xl"
+                    className="p-3 mr-2 bg-white/5 border border-white/10 rounded-full text-white hover:bg-blue-500/40 transition-all shadow-2xl backdrop-blur-md"
+                    title="Next Period"
                   >
                     <ChevronRight size={20} />
                   </button>
@@ -172,7 +175,7 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
 const ChartTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-ink-800 border border-ink-600 rounded-md px-3 py-2 shadow-xl">
+    <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-xl px-4 py-3 shadow-2xl">
       <p className="font-mono text-[10px] text-steel-400 mb-1">{label}</p>
       {payload.map((p, i) => (
         <p key={i} className="font-mono text-xs" style={{ color: p.color }}>
@@ -291,7 +294,7 @@ export default function Forecast() {
         title="Predictive Analytics"
         subtitle="Forecast demand and visualize inventory datasets"
         action={
-          <div className="flex bg-ink-800 p-1 rounded-lg border border-ink-600">
+          <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 shadow-inner">
             <button
               className={`px-3 py-1.5 rounded-md text-[10px] uppercase font-bold tracking-wider transition-all flex items-center gap-2 ${mode === 'forecast' ? 'bg-amber-400 text-ink-900 shadow-lg' : 'text-steel-400 hover:text-white'}`}
               onClick={() => setMode('forecast')}
@@ -571,7 +574,7 @@ export default function Forecast() {
                       {dataset.slice(0, showAllRows ? dataset.length : 10).map((item, i) => (
                         <tr
                           key={i}
-                          className="table-row cursor-pointer hover:bg-ink-800/50 group transition-all"
+                          className="table-row cursor-pointer hover:bg-white/5 group transition-all"
                           onClick={() => {
                             setSelectedProductForModal(item)
                             setIsModalOpen(true)
@@ -595,7 +598,7 @@ export default function Forecast() {
                   {!showAllRows && dataset.length > 10 && (
                     <button
                       onClick={() => setShowAllRows(true)}
-                      className="w-full text-[10px] text-steel-500 hover:text-amber-400 font-mono text-center py-4 bg-ink-950/20 hover:bg-ink-900/40 transition-all border-t border-white/5 uppercase tracking-widest"
+                      className="w-full text-[10px] text-steel hover:text-white font-mono text-center py-4 bg-white/5 hover:bg-white/10 transition-all border-t border-white/5 uppercase tracking-widest"
                     >
                       + {dataset.length - 10} more rows… (Click to reveal all)
                     </button>

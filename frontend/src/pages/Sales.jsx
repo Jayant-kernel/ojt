@@ -105,11 +105,11 @@ export default function Sales() {
       />
 
       {/* CSV format hint */}
-      <div className="card-sm p-4 border-dashed border-amber-400/20 bg-amber-400/3">
-        <p className="font-mono text-[10px] text-steel-400 uppercase tracking-widest mb-1">CSV Format</p>
-        <p className="font-mono text-xs text-amber-400/70">
+      <div className="card-sm p-4 border-dashed border-blue-400/20 bg-blue-400/5">
+        <p className="font-mono text-[9px] text-steel uppercase tracking-[0.2em] mb-1.5 font-bold">Standardized CSV Protocol</p>
+        <div className="font-mono text-xs text-blue-300/80 bg-white/5 p-2 rounded border border-white/5">
           product_sku, quantity, unit_price, sale_date (YYYY-MM-DD)
-        </p>
+        </div>
       </div>
 
       {/* Sales Table */}
@@ -219,21 +219,23 @@ export default function Sales() {
         ) : (
           <div className="space-y-5">
             <div
-              className="border-2 border-dashed border-ink-600 hover:border-amber-400/50 rounded-lg p-8
-                         flex flex-col items-center gap-3 cursor-pointer transition-colors"
+              className="border-2 border-dashed border-white/10 hover:border-blue-400/50 rounded-2xl p-10
+                         flex flex-col items-center gap-4 cursor-pointer transition-all bg-white/[0.02] group"
               onClick={() => fileRef.current?.click()}
             >
-              <Upload size={24} className="text-steel-400" />
+              <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-blue-500/30 group-hover:bg-blue-500/5 transition-all">
+                <Upload size={24} className="text-steel group-hover:text-blue-400 transition-colors" />
+              </div>
               {csvFile ? (
                 <div className="text-center">
-                  <p className="font-mono text-sm text-amber-400">{csvFile.name}</p>
-                  <p className="font-mono text-xs text-steel-400">{(csvFile.size / 1024).toFixed(1)} KB</p>
+                  <p className="font-mono text-sm text-blue-400 font-bold">{csvFile.name}</p>
+                  <p className="font-mono text-[10px] text-steel uppercase tracking-widest mt-1">{(csvFile.size / 1024).toFixed(1)} KB</p>
                 </div>
               ) : (
-                <>
-                  <p className="font-mono text-sm text-steel-300">Click to select CSV file</p>
-                  <p className="font-mono text-xs text-steel-400">Max 10 MB</p>
-                </>
+                <div className="text-center">
+                  <p className="font-mono text-sm text-steel font-bold uppercase tracking-widest mb-1">Upload Data Stream</p>
+                  <p className="font-mono text-[10px] text-steel/40 uppercase tracking-widest">Max 10 MB CSV</p>
+                </div>
               )}
               <input
                 ref={fileRef}

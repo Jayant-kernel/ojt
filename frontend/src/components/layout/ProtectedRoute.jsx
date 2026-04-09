@@ -10,8 +10,8 @@ export default function ProtectedRoute({ children }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ink-950 flex items-center justify-center">
-        <Spinner size={24} />
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner size={32} />
       </div>
     )
   }

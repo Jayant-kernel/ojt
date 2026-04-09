@@ -30,42 +30,47 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-ink-950/40 backdrop-blur-3xl border-r border-white/[0.05] flex flex-col z-40">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-white/[0.03] backdrop-blur-[24px] border-r border-white/10 flex flex-col z-40 shadow-2xl">
       {/* Logo */}
-      <div className="px-6 py-6">
+      <div className="px-6 py-8">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-[0_0_15px_rgba(169,85,255,0.3)]">
-            <Activity size={18} className="text-white" strokeWidth={2.5} />
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(100,160,255,0.3)] border border-white/20">
+            <Activity size={20} className="text-white" strokeWidth={2.5} />
           </div>
           <div>
-            <div className="font-display font-bold text-lg text-white leading-none tracking-wide">SIFS<span className="text-primary-500">®</span></div>
-            <div className="font-mono text-[9px] text-steel-400 tracking-widest mt-1 uppercase">Inventory Sys</div>
+            <div className="font-display font-bold text-xl text-white mr-1 flex items-center gap-1">
+              SIFS<span className="text-blue-400 text-xs">®</span>
+            </div>
+            <div className="font-mono text-[9px] text-steel tracking-[0.2em] mt-1 uppercase">Intelli-Core</div>
           </div>
         </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-4 px-4 space-y-1.5 overflow-y-auto">
-        <div className="text-[10px] font-mono text-steel-500 uppercase tracking-widest mb-3 px-2">Main Menu</div>
+      <nav className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
+        <div className="text-[10px] font-mono text-white/30 uppercase tracking-[0.2em] mb-4 px-3">Protocol Navigation</div>
         {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
             end={to === '/'}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+              `flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group relative overflow-hidden ${
                 isActive
-                  ? 'bg-ink-800 border border-white/[0.05] text-white shadow-md'
-                  : 'text-steel-400 hover:text-steel-200 hover:bg-white/[0.02]'
+                  ? 'bg-white/[0.08] text-white shadow-[inset_0_0_15px_rgba(140,100,255,0.15)]'
+                  : 'text-steel hover:text-white hover:bg-white/[0.04]'
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <Icon size={18} className={isActive ? 'text-primary-400' : 'text-steel-400 group-hover:text-steel-300'} strokeWidth={isActive ? 2.5 : 2} />
+                {isActive && (
+                   <div className="absolute left-0 top-1/4 bottom-1/4 w-[3px] bg-gradient-to-b from-blue-400 to-purple-500 rounded-r-full shadow-[0_0_10px_rgba(100,160,255,0.6)]" />
+                )}
+                <Icon size={18} className={isActive ? 'text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]' : 'text-steel group-hover:text-white transition-colors'} strokeWidth={isActive ? 2.5 : 2} />
                 <span className={`font-mono text-[13px] tracking-wide ${isActive ? 'font-bold' : 'font-medium'}`}>{label}</span>
-                {isActive && label === 'Dashboard' && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-400 shadow-[0_0_5px_rgba(169,85,255,0.8)]"></div>
+                {isActive && (
+                  <div className="ml-auto w-1 h-1 rounded-full bg-blue-400 animate-pulse shadow-[0_0_5px_rgba(96,165,250,1)]"></div>
                 )}
               </>
             )}
@@ -74,28 +79,28 @@ export default function Sidebar() {
       </nav>
 
       {/* User info */}
-      <div className="p-4 mx-4 mb-4 rounded-xl bg-white/[0.02] backdrop-blur-lg border border-white/[0.05]">
-        <div className="flex items-center gap-3 px-2 py-2 mb-2">
-          <div className="w-9 h-9 rounded-full bg-primary-600/20 border border-primary-500/30 flex items-center justify-center">
-            <span className="font-mono text-sm text-primary-400 font-bold">
+      <div className="p-4 mx-3 mb-6 rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/10 shadow-lg">
+        <div className="flex items-center gap-3 px-1 py-1 mb-4">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center shadow-inner">
+            <span className="font-mono text-sm text-blue-300 font-black">
               {user?.full_name?.[0]?.toUpperCase() ?? '?'}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-display font-bold text-sm text-white truncate">{user?.full_name || 'Admin'}</div>
+            <div className="font-display font-bold text-sm text-white truncate">{user?.full_name || 'Terminal User'}</div>
             <div className="flex items-center gap-1.5 mt-0.5">
-               <div className="w-2 h-2 rounded-full bg-success shadow-[0_0_5px_rgba(34,197,94,0.5)]"></div>
-               <div className="font-mono text-[10px] text-steel-400 uppercase tracking-widest leading-none">Online</div>
+               <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_#22C55E]"></div>
+               <div className="font-mono text-[9px] text-steel uppercase tracking-widest leading-none">Status: Secured</div>
             </div>
           </div>
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-steel-400 bg-white/5 border border-white/10
-                     backdrop-blur-md hover:text-white hover:bg-white/10 transition-all duration-200"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-steel bg-white/5 border border-white/10
+                     backdrop-blur-md hover:text-white hover:bg-white/10 hover:border-white/20 transition-all duration-300 group"
         >
-          <LogOut size={14} />
-          <span className="font-mono text-xs font-medium">Disconnect</span>
+          <LogOut size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest">Terminate Session</span>
         </button>
       </div>
     </aside>

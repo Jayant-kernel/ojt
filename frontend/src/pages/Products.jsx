@@ -139,11 +139,18 @@ export default function Products() {
         }
       />
 
+      <div className="card-sm p-4 border-dashed border-blue-400/20 bg-blue-400/5 mb-6">
+        <p className="font-mono text-[9px] text-steel uppercase tracking-[0.2em] mb-1.5 font-bold">CSV Structure Protocol</p>
+        <div className="font-mono text-xs text-blue-300/80 bg-white/5 p-2 rounded border border-white/5">
+          sku, name, cost_price, selling_price, current_stock, reorder_point, reorder_quantity, max_stock
+        </div>
+      </div>
+
       <SectionCard>
         {/* Search bar */}
         <div className="flex items-center gap-3 mb-5">
           <div className="relative flex-1 max-w-xs">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-steel-400" />
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
             <input
               className="input pl-8"
               placeholder="Search by name or SKU…"
@@ -158,7 +165,9 @@ export default function Products() {
 
         {/* Table */}
         {loading ? (
-          <div className="flex justify-center py-12"><Spinner size={20} /></div>
+          <div className="min-h-screen flex items-center justify-center">
+            <Spinner size={32} />
+          </div>
         ) : products.length === 0 ? (
           <EmptyState icon={Package} message="No products found" sub="Create your first product to get started" />
         ) : (
@@ -179,14 +188,14 @@ export default function Products() {
               <tbody>
                 {products.map((p) => (
                   <tr key={p.id} className="table-row">
-                    <td className="table-cell text-amber-400 font-bold">{p.sku}</td>
+                    <td className="table-cell text-blue-400 font-bold font-mono text-xs">{p.sku}</td>
                     <td className="table-cell text-white font-display font-semibold text-xs max-w-[160px] truncate">{p.name}</td>
                     <td className="table-cell text-steel-400">{p.category?.name ?? '—'}</td>
                     <td className="table-cell text-right">₹{parseFloat(p.cost_price).toFixed(2)}</td>
                     <td className="table-cell text-right text-green-400">₹{parseFloat(p.selling_price).toFixed(2)}</td>
                     <td className="table-cell text-right">
                       <button
-                        className="hover:text-amber-400 transition-colors"
+                        className="hover:text-blue-400 transition-colors font-mono font-bold text-base"
                         onClick={() => { setStockItem(p); setAdjustment(0) }}
                       >
                         {p.current_stock}
