@@ -505,10 +505,12 @@ export default function Forecast() {
                   )}
                 </div>
               </SectionCard>
-            )}
-          </div>
-        )}
-      </div>
+            </div>
+          ) : (
+            <EmptyState icon={Database} message="No dataset loaded" sub="Wait while we fetch inventory.csv" />
+          )}
+        </div>
+      )}
 
       <ProductSalesModal 
         product={selectedProductForModal} 
