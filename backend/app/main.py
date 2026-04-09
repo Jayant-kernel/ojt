@@ -88,7 +88,22 @@ def create_app() -> FastAPI:
 
 app = create_app()
 
-# ── Health check ──────────────────────────────────────────────────────────
+# ── Health check ───────────────────────────────────────────────────────────
 @app.get("/", tags=["Health"])
-def health():
-    return {"status": "ok"}
+async def health():
+    db_status = "unknown"
+    try:
+        from sqlalchemy import text
+        from app.db.session import AsyncSessionLocal
+        async with AsyncSessionLocal() as session:
+            await session.execute(text("SELECT 1"))
+            db_status = "connected"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+    
+    return {
+        "status": "ok",
+        "database": db_status,
+        "environment": "production" if not settings.DEBUG else "development",
+        "cors_origins": settings.BACKEND_CORS_ORIGINS
+    }
