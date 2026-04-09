@@ -30,7 +30,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-ink-950 border-r border-white/[0.02] flex flex-col z-40">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-ink-950/40 backdrop-blur-3xl border-r border-white/[0.05] flex flex-col z-40">
       {/* Logo */}
       <div className="px-6 py-6">
         <div className="flex items-center gap-3">
@@ -74,7 +74,7 @@ export default function Sidebar() {
       </nav>
 
       {/* User info */}
-      <div className="p-4 mx-4 mb-4 rounded-xl bg-ink-900 border border-white/[0.03]">
+      <div className="p-4 mx-4 mb-4 rounded-xl bg-white/[0.02] backdrop-blur-lg border border-white/[0.05]">
         <div className="flex items-center gap-3 px-2 py-2 mb-2">
           <div className="w-9 h-9 rounded-full bg-primary-600/20 border border-primary-500/30 flex items-center justify-center">
             <span className="font-mono text-sm text-primary-400 font-bold">
@@ -91,8 +91,8 @@ export default function Sidebar() {
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-steel-400 border border-white/[0.02]
-                     hover:text-white hover:bg-white/5 transition-all duration-200"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-steel-400 bg-white/5 border border-white/10
+                     backdrop-blur-md hover:text-white hover:bg-white/10 transition-all duration-200"
         >
           <LogOut size={14} />
           <span className="font-mono text-xs font-medium">Disconnect</span>
