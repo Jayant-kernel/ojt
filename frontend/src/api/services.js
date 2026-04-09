@@ -107,3 +107,8 @@ export const forecastsApi = {
   metrics: (productId) =>
     api.get(`/forecasts/${productId}/metrics`).then((r) => r.data),
 }
+// ── Inventory Dataset ─────────────────────────────────────────────────────────
+export const inventoryApi = {
+  getDataset: () =>
+    api.get('/inventory/dataset').then((r) => r.data),
+}
