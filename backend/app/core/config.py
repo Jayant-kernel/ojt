@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
 
     # ── Security ─────────────────────────────────────────────────────────────
-    SECRET_KEY: str = secrets.token_urlsafe(32)
+    SECRET_KEY: str = "changeme-set-a-real-secret-in-env"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -74,7 +74,16 @@ class Settings(BaseSettings):
 
     # ── CORS ─────────────────────────────────────────────────────────────────
     BACKEND_CORS_ORIGINS: List[str] = ["*"]
-
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors(cls, v):
+        if isinstance(v, str):
+            import json
+            try:
+                return json.loads(v)  # parses ["https://..."]
+            except Exception:
+                return [v]  # single URL string fallback
+        return v
     # ── File Upload ───────────────────────────────────────────────────────────
     MAX_UPLOAD_SIZE_MB: int = 10
     UPLOAD_DIR: str = "uploads"
