@@ -43,12 +43,17 @@ def get_inventory_dataset():
                     price_raw = row.get("Unit_Price", "0").replace("$", "").replace(",", "").strip()
                     price = float(price_raw) if price_raw else 0.0
                     
+                    # Generate a dummy market price (e.g. 10-20% variance)
+                    import random
+                    market_price = price * (0.9 + random.random() * 0.2)
+                    
                     item = {
                         "sku": row.get("Product_ID"),
                         "name": row.get("Product_Name"),
                         "category": row.get("Catagory"),
                         "current_stock": int(row.get("Stock_Quantity", 0)),
                         "selling_price": price,
+                        "market_price": round(market_price, 2),
                         "reorder_point": int(row.get("Reorder_Level", 0)),
                         "reorder_quantity": int(row.get("Reorder_Quantity", 0)),
                         "status": row.get("Status")
