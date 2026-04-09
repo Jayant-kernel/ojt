@@ -246,12 +246,10 @@ export default function Forecast() {
           <SectionCard title="Analyze Inventory Dataset">
             <div className="flex flex-wrap items-end gap-4">
               <div className="flex-1 min-w-48">
-                <Field label="Metric (Arguments from Products)">
+                <Field label="Analytics Mode">
                   <select className="input" value={activeMetric} onChange={(e) => setActiveMetric(e.target.value)}>
-                    <option value="current_stock">Stock Level</option>
-                    <option value="selling_price">Selling Price</option>
-                    <option value="reorder_point">Reorder Point</option>
-                    <option value="reorder_quantity">Reorder Quantity</option>
+                    <option value="current_stock">Stock vs Reorder Point</option>
+                    <option value="selling_price">Price vs Market Trend</option>
                   </select>
                 </Field>
               </div>
@@ -274,14 +272,22 @@ export default function Forecast() {
                 <KpiCard label="Avg Price" value={`₹${(dataset.reduce((a, b) => a + b.selling_price, 0) / dataset.length).toFixed(2)}`} sub="Per unit" icon={BarChart2} accent delay={100} />
               </div>
 
-              <SectionCard title={`Product Comparison - ${activeMetric.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`}>
+              <SectionCard title={activeMetric === 'current_stock' ? 'Stock Level vs Reorder Point' : 'Price vs Market Comparison'}>
                 <div className="h-[400px] w-full pt-4">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={dataset.slice(0, 15)} margin={{ top: 10, right: 10, bottom: 60, left: 0 }}>
                       <defs>
-                        <linearGradient id="comparisonGrad" x1="0" y1="0" x2="0" y2="1">
+                        <linearGradient id="amberGrad" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.3} />
                           <stop offset="95%" stopColor="#fbbf24" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#f87171" stopOpacity={0.2} />
+                          <stop offset="95%" stopColor="#f87171" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="cyanGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#1E2533" vertical={false} />
@@ -301,16 +307,51 @@ export default function Forecast() {
                         width={40}
                       />
                       <Tooltip content={<ChartTooltip />} />
-                      <Area
-                        type="monotone"
-                        dataKey={activeMetric}
-                        name={activeMetric.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        stroke="#fbbf24"
-                        strokeWidth={2}
-                        fill="url(#comparisonGrad)"
-                        dot={{ r: 3, fill: '#fbbf24', strokeWidth: 0 }}
-                        activeDot={{ r: 5, fill: '#fbbf24' }}
-                      />
+                      <Legend verticalAlign="top" height={36} wrapperStyle={{ fontFamily: 'JetBrains Mono', fontSize: 10 }} />
+                      
+                      {activeMetric === 'current_stock' ? (
+                        <>
+                          <Area
+                            type="monotone"
+                            dataKey="current_stock"
+                            name="Stock Level"
+                            stroke="#fbbf24"
+                            strokeWidth={2}
+                            fill="url(#amberGrad)"
+                            dot={{ r: 2, fill: '#fbbf24' }}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="reorder_point"
+                            name="Reorder Point"
+                            stroke="#f87171"
+                            strokeWidth={2}
+                            fill="url(#redGrad)"
+                            strokeDasharray="5 5"
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <Area
+                            type="monotone"
+                            dataKey="selling_price"
+                            name="Selling Price"
+                            stroke="#22d3ee"
+                            strokeWidth={2}
+                            fill="url(#cyanGrad)"
+                            dot={{ r: 2, fill: '#22d3ee' }}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="market_price"
+                            name="Market Price"
+                            stroke="#a855f7"
+                            strokeWidth={2}
+                            fill="#a855f7"
+                            fillOpacity={0.1}
+                          />
+                        </>
+                      )}
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -328,6 +369,7 @@ export default function Forecast() {
                         <th className="text-left px-4 pb-2">Name</th>
                         <th className="text-left px-4 pb-2">Category</th>
                         <th className="text-right px-4 pb-2">Price</th>
+                        <th className="text-right px-4 pb-2">Market Price</th>
                         <th className="text-right px-4 pb-2">Stock</th>
                       </tr>
                     </thead>
@@ -338,6 +380,7 @@ export default function Forecast() {
                           <td className="table-cell text-white font-display font-semibold text-xs truncate max-w-[150px]">{item.name}</td>
                           <td className="table-cell text-steel-400">{item.category}</td>
                           <td className="table-cell text-right text-green-400">₹{item.selling_price.toFixed(2)}</td>
+                          <td className="table-cell text-right text-purple-400">₹{item.market_price?.toFixed(2)}</td>
                           <td className="table-cell text-right">{item.current_stock}</td>
                         </tr>
                       ))}
