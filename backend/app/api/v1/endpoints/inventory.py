@@ -6,7 +6,19 @@ from fastapi import APIRouter, HTTPException, status
 
 router = APIRouter(prefix="/inventory", tags=["Inventory Dataset"])
 
-CSV_PATH = Path(__file__).parent.parent.parent.parent.parent / "inventory.csv"
+# Try multiple possible locations for inventory.csv
+BASE_DIR = Path(__file__).parent.parent.parent.parent.parent # backend/
+POSSIBLE_PATHS = [
+    BASE_DIR / "inventory.csv",
+    Path(os.getcwd()) / "inventory.csv",
+    Path(os.getcwd()) / "backend" / "inventory.csv",
+]
+
+CSV_PATH = None
+for p in POSSIBLE_PATHS:
+    if p.exists():
+        CSV_PATH = p
+        break
 
 @router.get("/dataset", response_model=List[Dict[str, Any]])
 def get_inventory_dataset():

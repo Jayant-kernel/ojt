@@ -38,7 +38,7 @@ export default function Forecast() {
   const [activeMetric, setActiveMetric] = useState('current_stock')
 
   useEffect(() => {
-    productsApi.list({ page_size: 200 })
+    productsApi.list({ page_size: 100 })
       .then((d) => setProducts(d.items ?? []))
       .catch(() => {})
   }, [])
