@@ -96,7 +96,13 @@ export const salesApi = {
 // ── Forecasts ─────────────────────────────────────────────────────────────────
 export const forecastsApi = {
   generate: (productId, horizonDays = 90) =>
-    api.post('/forecasts/generate', { product_id: productId, horizon_days: horizonDays }).then((r) => r.data),
+    api.post('/forecasts/generate', {
+      product_id: productId,
+      horizon_days: horizonDays
+    }).then((r) => r.data),
+
+  getProducts: () =>
+    api.get('/forecasts/products').then(r => r.data),
 
   get: (productId) =>
     api.get(`/forecasts/${productId}/latest`).then((r) => r.data),

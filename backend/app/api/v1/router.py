@@ -2,7 +2,7 @@
 API v1 router — assembles all endpoint sub-routers.
 """
 from fastapi import APIRouter
-from app.api.v1.endpoints import auth, category, supplier, products, inventory
+from app.api.v1.endpoints import auth, category, supplier, products, inventory, forecasts
 
 api_router = APIRouter()
 
@@ -11,3 +11,4 @@ api_router.include_router(category.router)
 api_router.include_router(supplier.router)
 api_router.include_router(products.router)
 api_router.include_router(inventory.router)
+api_router.include_router(forecasts.router)
