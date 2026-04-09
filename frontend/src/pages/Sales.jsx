@@ -105,9 +105,9 @@ export default function Sales() {
       />
 
       {/* CSV format hint */}
-      <div className="card-sm p-4 border-dashed border-blue-400/20 bg-blue-400/5">
-        <p className="font-mono text-[9px] text-steel uppercase tracking-[0.2em] mb-1.5 font-bold">Standardized CSV Protocol</p>
-        <div className="font-mono text-xs text-blue-300/80 bg-white/5 p-2 rounded border border-white/5">
+      <div className="card-sm p-4 border-dashed border-blue-400/20 bg-blue-400/5 hover:bg-blue-400/10 hover:border-blue-400/40 transition-all duration-300 transform hover:-translate-y-1">
+        <p className="font-mono text-[9px] text-steel-400 uppercase tracking-[0.2em] mb-1.5 font-bold">Standardized CSV Protocol</p>
+        <div className="font-mono text-xs text-blue-300/80 bg-white/5 p-2 rounded-xl border border-white/5">
           product_sku, quantity, unit_price, sale_date (YYYY-MM-DD)
         </div>
       </div>
@@ -220,10 +220,10 @@ export default function Sales() {
           <div className="space-y-5">
             <div
               className="border-2 border-dashed border-white/10 hover:border-blue-400/50 rounded-2xl p-10
-                         flex flex-col items-center gap-4 cursor-pointer transition-all bg-white/[0.02] group"
+                         flex flex-col items-center gap-4 cursor-pointer transition-all duration-500 bg-white/[0.02] hover:bg-white/[0.06] transform hover:-translate-y-2 group shadow-2xl"
               onClick={() => fileRef.current?.click()}
             >
-              <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-blue-500/30 group-hover:bg-blue-500/5 transition-all">
+              <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-blue-500/40 group-hover:bg-blue-500/10 transition-all group-hover:scale-110">
                 <Upload size={24} className="text-steel group-hover:text-blue-400 transition-colors" />
               </div>
               {csvFile ? (

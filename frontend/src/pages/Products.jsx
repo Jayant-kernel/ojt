@@ -139,9 +139,9 @@ export default function Products() {
         }
       />
 
-      <div className="card-sm p-4 border-dashed border-blue-400/20 bg-blue-400/5 mb-6">
-        <p className="font-mono text-[9px] text-steel uppercase tracking-[0.2em] mb-1.5 font-bold">CSV Structure Protocol</p>
-        <div className="font-mono text-xs text-blue-300/80 bg-white/5 p-2 rounded border border-white/5">
+      <div className="card-sm p-4 border-dashed border-blue-400/20 bg-blue-400/5 hover:bg-blue-400/10 hover:border-blue-400/40 transition-all duration-300 transform hover:-translate-y-1 mb-6">
+        <p className="font-mono text-[9px] text-steel-400 uppercase tracking-[0.2em] mb-1.5 font-bold">CSV Structure Protocol</p>
+        <div className="font-mono text-xs text-blue-300/80 bg-white/5 p-2 rounded-xl border border-white/5">
           sku, name, cost_price, selling_price, current_stock, reorder_point, reorder_quantity, max_stock
         </div>
       </div>

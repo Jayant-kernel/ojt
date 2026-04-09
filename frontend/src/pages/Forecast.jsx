@@ -294,18 +294,26 @@ export default function Forecast() {
         title="Predictive Analytics"
         subtitle="Forecast demand and visualize inventory datasets"
         action={
-          <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 shadow-inner">
+          <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 shadow-inner backdrop-blur-2xl">
             <button
-              className={`px-3 py-1.5 rounded-md text-[10px] uppercase font-bold tracking-wider transition-all flex items-center gap-2 ${mode === 'forecast' ? 'bg-amber-400 text-ink-900 shadow-lg' : 'text-steel-400 hover:text-white'}`}
+              className={`px-4 py-2 rounded-xl text-[10px] uppercase font-bold tracking-widest transition-all duration-300 flex items-center gap-2 ${
+                mode === 'forecast' 
+                  ? 'bg-amber-500/20 text-amber-200 shadow-[0_0_20px_rgba(251,191,36,0.15)] border border-amber-500/30 scale-105' 
+                  : 'text-steel-400 hover:text-white hover:bg-white/5'
+              }`}
               onClick={() => setMode('forecast')}
             >
-              <Zap size={12} /> Demand Forecast
+              <Zap size={12} className={mode === 'forecast' ? 'animate-pulse' : ''} /> Demand Forecast
             </button>
             <button
-              className={`px-3 py-1.5 rounded-md text-[10px] uppercase font-bold tracking-wider transition-all flex items-center gap-2 ${mode === 'dataset' ? 'bg-amber-400 text-ink-900 shadow-lg' : 'text-steel-400 hover:text-white'}`}
+              className={`px-4 py-2 rounded-xl text-[10px] uppercase font-bold tracking-widest transition-all duration-300 flex items-center gap-2 ${
+                mode === 'dataset' 
+                  ? 'bg-amber-500/20 text-amber-200 shadow-[0_0_20px_rgba(251,191,36,0.15)] border border-amber-500/30 scale-105' 
+                  : 'text-steel-400 hover:text-white hover:bg-white/5'
+              }`}
               onClick={() => setMode('dataset')}
             >
-              <Database size={12} /> Dataset View
+              <Database size={12} className={mode === 'dataset' ? 'animate-pulse' : ''} /> Dataset View
             </button>
           </div>
         }

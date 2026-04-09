@@ -77,7 +77,7 @@ export default function Dashboard() {
       <div className="flex items-center justify-between pb-4 border-b border-white/[0.05]">
         <h1 className="font-display font-medium text-2xl text-white tracking-wide">Dashboard Overview</h1>
         <div className="flex items-center gap-4">
-          <button className="bg-primary-600/20 backdrop-blur-md hover:bg-primary-600/30 text-primary-400 px-5 py-2.5 rounded-full font-mono text-xs transition-colors border border-primary-600/20 flex items-center gap-2 shadow-[0_0_10px_rgba(169,85,255,0.15)]">
+          <button className="btn-primary gap-2 shadow-[0_0_20px_rgba(169,85,255,0.15)]">
             <Activity size={14} />
             <span>Generate Report</span>
           </button>
@@ -86,15 +86,15 @@ export default function Dashboard() {
 
       <div className="flex items-center justify-between">
         <h2 className="font-display font-semibold text-xl text-white">Top Inventory Metrics</h2>
-        <div className="flex bg-white/[0.05] backdrop-blur-md border border-white/[0.05] rounded-full p-1 shadow-inner">
+        <div className="flex bg-white/5 backdrop-blur-xl border border-white/10 rounded-full p-1 shadow-inner">
           {['24H', '7D', '30D'].map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
-              className={`px-4 py-1.5 rounded-full font-mono text-xs transition-colors ${
+              className={`px-5 py-2 rounded-full font-mono text-xs transition-all duration-300 ${
                 timeRange === range
-                  ? 'bg-white/10 text-white shadow-sm'
-                  : 'text-steel-400 hover:text-white'
+                  ? 'bg-white/10 text-white shadow-lg scale-105 border border-white/10'
+                  : 'text-steel-400 hover:text-white hover:bg-white/5'
               }`}
             >
               {range}
