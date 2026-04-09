@@ -153,7 +153,13 @@ export default function Dashboard() {
         {/* Units chart */}
         <SectionCard title="Units Sold" className="animate-slide-up stagger-3">
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={salesData.slice(-10)} margin={{ top: 5, right: 0, bottom: 0, left: 0 }}>
+            <AreaChart data={salesData.slice(-10)} margin={{ top: 5, right: 0, bottom: 0, left: 0 }}>
+              <defs>
+                <linearGradient id="unitsGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#fbbf24" stopOpacity={0} />
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#1E2533" vertical={false} />
               <XAxis
                 dataKey="date"
@@ -163,8 +169,17 @@ export default function Dashboard() {
               />
               <YAxis hide />
               <Tooltip content={<ChartTooltip />} />
-              <Bar dataKey="units" name="Units" fill="#3D4F6B" radius={[2, 2, 0, 0]} activeBar={{ fill: '2596be' }} />
-            </BarChart>
+              <Area
+                type="monotone"
+                dataKey="units"
+                name="Units"
+                stroke="#fbbf24"
+                strokeWidth={2}
+                fill="url(#unitsGrad)"
+                dot={{ r: 3, fill: '#fbbf24', strokeWidth: 0 }}
+                activeDot={{ r: 5, fill: '#fbbf24' }}
+              />
+            </AreaChart>
           </ResponsiveContainer>
         </SectionCard>
       </div>

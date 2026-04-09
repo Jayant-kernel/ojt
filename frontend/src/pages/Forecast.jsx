@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { TrendingUp, Zap, BarChart2, Database, Layers } from 'lucide-react'
 import {
   ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend, BarChart, Bar
+  Tooltip, ResponsiveContainer, Legend, BarChart, Bar, AreaChart
 } from 'recharts'
 import { productsApi, forecastsApi, inventoryApi } from '../api/services'
 import { PageHeader, SectionCard, Spinner, EmptyState, Field, KpiCard } from '../components/ui'
@@ -277,7 +277,13 @@ export default function Forecast() {
               <SectionCard title={`Product Comparison - ${activeMetric.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`}>
                 <div className="h-[400px] w-full pt-4">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={dataset.slice(0, 15)} margin={{ top: 10, right: 10, bottom: 60, left: 0 }}>
+                    <AreaChart data={dataset.slice(0, 15)} margin={{ top: 10, right: 10, bottom: 60, left: 0 }}>
+                      <defs>
+                        <linearGradient id="comparisonGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#fbbf24" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#1E2533" vertical={false} />
                       <XAxis
                         dataKey="name"
@@ -295,14 +301,17 @@ export default function Forecast() {
                         width={40}
                       />
                       <Tooltip content={<ChartTooltip />} />
-                      <Bar
+                      <Area
+                        type="monotone"
                         dataKey={activeMetric}
                         name={activeMetric.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        fill="#fbbf24"
-                        radius={[4, 4, 0, 0]}
-                        maxBarSize={40}
+                        stroke="#fbbf24"
+                        strokeWidth={2}
+                        fill="url(#comparisonGrad)"
+                        dot={{ r: 3, fill: '#fbbf24', strokeWidth: 0 }}
+                        activeDot={{ r: 5, fill: '#fbbf24' }}
                       />
-                    </BarChart>
+                    </AreaChart>
                   </ResponsiveContainer>
                 </div>
                 <p className="text-[10px] text-steel-500 font-mono text-center mt-6 uppercase tracking-wider">
