@@ -22,7 +22,9 @@ services:
       - key: BACKEND_CORS_ORIGINS
         value: '["https://your-frontend.vercel.app"]'
       - key: DEBUG
-        value: false
+        value: "false"
+      - key: PYTHON_VERSION
+        value: 3.11.9
 
 databases:
   - name: smart-inventory-db
