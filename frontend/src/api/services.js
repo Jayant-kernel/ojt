@@ -111,4 +111,6 @@ export const forecastsApi = {
 export const inventoryApi = {
   getDataset: () =>
     api.get('/inventory/dataset').then((r) => r.data),
+  getProductSales: (sku) =>
+    api.get(`/inventory/sales/${sku}`).then((r) => r.data),
 }

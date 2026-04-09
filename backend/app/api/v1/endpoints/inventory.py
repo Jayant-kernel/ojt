@@ -72,3 +72,43 @@ def get_inventory_dataset():
         )
 
     return dataset
+
+SALES_CSV_PATH = None
+if CSV_PATH:
+    SALES_CSV_PATH = CSV_PATH.parent / "sales_data_weekly.csv"
+
+@router.get("/sales/{sku}", response_model=List[Dict[str, Any]])
+def get_product_sales(sku: str):
+    """
+    Read sales_data_weekly.csv and return weekly sales for a specific SKU.
+    Filters rows where product_name matches the provided SKU.
+    """
+    if not SALES_CSV_PATH or not os.path.exists(SALES_CSV_PATH):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Sales CSV not found at {SALES_CSV_PATH}"
+        )
+
+    sales_history = []
+    try:
+        with open(SALES_CSV_PATH, mode='r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            # CSV Headers: year_week, product_name, sales
+            for row in reader:
+                if row.get("product_name") == sku:
+                    try:
+                        sales_history.append({
+                            "week": row.get("year_week", ""),
+                            "sales": int(row.get("sales", 0))
+                        })
+                    except (ValueError, TypeError):
+                        continue
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error reading sales CSV: {str(e)}"
+        )
+
+    # Sort by year_week string (e.g., '2025-01')
+    sales_history.sort(key=lambda x: x["week"])
+    return sales_history

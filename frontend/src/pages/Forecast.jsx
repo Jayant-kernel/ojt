@@ -2,7 +2,7 @@
  * Forecast page — select a product, trigger forecast, display predictions + metrics.
  */
 import { useState, useEffect } from 'react'
-import { TrendingUp, Zap, BarChart2, Database, Layers } from 'lucide-react'
+import { TrendingUp, Zap, BarChart2, Database, Layers, X, LineChart } from 'lucide-react'
 import {
   ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend, BarChart, Bar, AreaChart
@@ -10,6 +10,102 @@ import {
 import { productsApi, forecastsApi, inventoryApi } from '../api/services'
 import { PageHeader, SectionCard, Spinner, EmptyState, Field, KpiCard } from '../components/ui'
 import toast from 'react-hot-toast'
+
+const ProductSalesModal = ({ product, isOpen, onClose }) => {
+  const [sales, setSales] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (isOpen && product) {
+      setLoading(true)
+      inventoryApi.getProductSales(product.sku)
+        .then(setSales)
+        .catch(() => toast.error('Failed to load sales history'))
+        .finally(() => setLoading(false))
+    } else {
+      setSales([])
+    }
+  }, [isOpen, product])
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/80 backdrop-blur-sm animate-fade-in">
+      <div className="bg-ink-900 border border-ink-600 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl animate-scale-up">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-ink-600 flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-display font-bold text-white leading-tight">{product?.name}</h3>
+            <p className="text-[10px] font-mono text-steel-400 uppercase tracking-widest">{product?.sku} • {product?.category}</p>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-ink-800 rounded-lg text-steel-400 hover:text-white transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 overflow-y-auto">
+          {loading ? (
+            <div className="h-64 flex flex-col items-center justify-center gap-3">
+              <Spinner size={32} />
+              <p className="font-mono text-xs text-steel-400">Loading 2025 Weekly Data...</p>
+            </div>
+          ) : sales.length > 0 ? (
+            <div className="space-y-6">
+              <div className="h-[400px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={sales} margin={{ top: 10, right: 10, bottom: 20, left: 0 }}>
+                    <defs>
+                      <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#fbbf24" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1E2533" vertical={false} />
+                    <XAxis 
+                       dataKey="week" 
+                       tick={{fontFamily: 'JetBrains Mono', fontSize: 9, fill: '#94A3B8'}}
+                       axisLine={false}
+                       tickLine={false}
+                       interval={3}
+                    />
+                    <YAxis 
+                       tick={{fontFamily: 'JetBrains Mono', fontSize: 10, fill: '#94A3B8'}}
+                       axisLine={false}
+                       tickLine={false}
+                    />
+                    <Tooltip content={<ChartTooltip />} />
+                    <Area 
+                      type="monotone" 
+                      dataKey="sales" 
+                      name="Weekly Sales" 
+                      stroke="#fbbf24" 
+                      strokeWidth={3}
+                      fill="url(#salesGrad)" 
+                      dot={{ r: 2, fill: '#fbbf24' }}
+                      activeDot={{ r: 6, fill: '#fbbf24', strokeWidth: 0 }}
+                      animationDuration={1000}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="grid grid-cols-4 gap-4">
+                <KpiCard label="Peak Week" value={Math.max(...sales.map(s => s.sales))} sub="Highest units sold" icon={TrendingUp} delay={0} />
+                <KpiCard label="Average" value={(sales.reduce((a,b) => a+b.sales, 0) / sales.length).toFixed(1)} sub="Units per week" icon={Layers} delay={50} />
+                <KpiCard label="Total Sales" value={sales.reduce((a,b) => a+b.sales, 0)} sub="Total in dataset" icon={Database} accent delay={100} />
+                <KpiCard label="Frequency" value={sales.length} sub="Weeks recorded" icon={BarChart2} delay={150} />
+              </div>
+            </div>
+          ) : (
+            <div className="py-12">
+              <EmptyState icon={BarChart2} message="No sales historical data found" sub={`No rows found for SKU ${product?.sku} in sales_data_weekly.csv`} />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const ChartTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
@@ -36,6 +132,10 @@ export default function Forecast() {
   const [mode, setMode]           = useState('forecast') // 'forecast' or 'dataset'
   const [dataset, setDataset]     = useState([])
   const [activeMetric, setActiveMetric] = useState('current_stock')
+
+  // Drill-down logic
+  const [selectedProductForModal, setSelectedProductForModal] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     productsApi.list({ page_size: 100 })
@@ -375,13 +475,25 @@ export default function Forecast() {
                     </thead>
                     <tbody>
                       {dataset.slice(0, 10).map((item, i) => (
-                        <tr key={i} className="table-row">
-                          <td className="table-cell text-amber-400 font-bold">{item.sku}</td>
-                          <td className="table-cell text-white font-display font-semibold text-xs truncate max-w-[150px]">{item.name}</td>
+                        <tr 
+                          key={i} 
+                          className="table-row cursor-pointer hover:bg-ink-800/50 group transition-all"
+                          onClick={() => {
+                            setSelectedProductForModal(item)
+                            setIsModalOpen(true)
+                          }}
+                        >
+                          <td className="table-cell text-amber-400 font-bold flex items-center gap-2">
+                            {item.sku}
+                            <LineChart size={10} className="text-steel-600 group-hover:text-amber-400 transition-colors opacity-0 group-hover:opacity-100" />
+                          </td>
+                          <td className="table-cell text-white font-display font-semibold text-xs truncate max-w-[150px] group-hover:text-amber-200 transition-colors">
+                            {item.name}
+                          </td>
                           <td className="table-cell text-steel-400">{item.category}</td>
                           <td className="table-cell text-right text-green-400">₹{item.selling_price.toFixed(2)}</td>
                           <td className="table-cell text-right text-purple-400">₹{item.market_price?.toFixed(2)}</td>
-                          <td className="table-cell text-right">{item.current_stock}</td>
+                          <td className="table-cell text-right font-mono">{item.current_stock}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -393,12 +505,16 @@ export default function Forecast() {
                   )}
                 </div>
               </SectionCard>
-            </div>
-          ) : (
-            <EmptyState icon={Database} message="No dataset loaded" sub="Wait while we fetch inventory.csv" />
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
+      </div>
+
+      <ProductSalesModal 
+        product={selectedProductForModal} 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   )
 }
