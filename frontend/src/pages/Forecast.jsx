@@ -2,10 +2,9 @@
  * Forecast page — select a product, trigger forecast, display predictions + metrics.
  */
 import { useState, useEffect } from 'react'
-import { TrendingUp, Zap, BarChart2, Database, Layers, X, LineChart } from 'lucide-react'
+import { TrendingUp, Zap, BarChart2, Database, Layers, X, LineChart, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
-  ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend, BarChart, Bar, AreaChart
+  Tooltip, ResponsiveContainer, Legend, BarChart, Bar, AreaChart, Brush
 } from 'recharts'
 import { productsApi, forecastsApi, inventoryApi } from '../api/services'
 import { PageHeader, SectionCard, Spinner, EmptyState, Field, KpiCard } from '../components/ui'
@@ -14,12 +13,18 @@ import toast from 'react-hot-toast'
 const ProductSalesModal = ({ product, isOpen, onClose }) => {
   const [sales, setSales] = useState([])
   const [loading, setLoading] = useState(false)
+  const [range, setRange] = useState({ startIndex: 0, endIndex: 11 })
 
   useEffect(() => {
     if (isOpen && product) {
       setLoading(true)
       inventoryApi.getProductSales(product.sku)
-        .then(setSales)
+        .then(data => {
+          setSales(data)
+          if (data.length > 0) {
+            setRange({ startIndex: 0, endIndex: Math.min(11, data.length - 1) })
+          }
+        })
         .catch(() => toast.error('Failed to load sales history'))
         .finally(() => setLoading(false))
     } else {
@@ -27,11 +32,36 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
     }
   }, [isOpen, product])
 
+  const handleScroll = (dir) => {
+    const shift = 4
+    const len = sales.length
+    if (len ===0) return
+    
+    if (dir === 'left') {
+      const nextStart = Math.max(0, range.startIndex - shift)
+      const diff = range.endIndex - range.startIndex
+      setRange({ startIndex: nextStart, endIndex: Math.min(len - 1, nextStart + diff) })
+    } else {
+      const nextEnd = Math.min(len - 1, range.endIndex + shift)
+      const diff = range.endIndex - range.startIndex
+      setRange({ startIndex: Math.max(0, nextEnd - diff), endIndex: nextEnd })
+    }
+  }
+
+  const handleWheel = (e) => {
+    if (e.deltaY > 0) handleScroll('right')
+    else handleScroll('left')
+  }
+
   if (!isOpen) return null
+
+  const peakValue = sales.length > 0 ? Math.max(...sales.map(s => s.sales)) : 0
+  const totalSalesValue = sales.reduce((acc, curr) => acc + curr.sales, 0)
+  const avgSalesValue = sales.length > 0 ? (totalSalesValue / sales.length).toFixed(1) : '0'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-ink-900 border border-ink-600 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl animate-scale-up">
+      <div className="bg-ink-900 border border-ink-600 rounded-xl w-full max-w-5xl max-h-[95vh] overflow-hidden shadow-2xl animate-scale-up">
         {/* Header */}
         <div className="px-6 py-4 border-b border-ink-600 flex items-center justify-between">
           <div>
@@ -46,15 +76,36 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
         {/* Content */}
         <div className="p-6 overflow-y-auto">
           {loading ? (
-            <div className="h-64 flex flex-col items-center justify-center gap-3">
+            <div className="h-[450px] flex flex-col items-center justify-center gap-3">
               <Spinner size={32} />
               <p className="font-mono text-xs text-steel-400">Loading 2025 Weekly Data...</p>
             </div>
           ) : sales.length > 0 ? (
             <div className="space-y-6">
-              <div className="h-[400px] w-full">
+              <div 
+                className="h-[400px] w-full relative group"
+                onWheel={handleWheel}
+              >
+                {/* Navigation Buttons Overlay */}
+                <div className="absolute inset-y-0 left-0 flex items-center z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button 
+                    onClick={() => handleScroll('left')}
+                    className="p-2 ml-2 bg-ink-800/80 border border-ink-600 rounded-full text-white hover:bg-amber-400 hover:text-ink-900 transition-all shadow-xl"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                </div>
+                <div className="absolute inset-y-0 right-0 flex items-center z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button 
+                    onClick={() => handleScroll('right')}
+                    className="p-2 mr-2 bg-ink-800/80 border border-ink-600 rounded-full text-white hover:bg-amber-400 hover:text-ink-900 transition-all shadow-xl"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={sales} margin={{ top: 10, right: 10, bottom: 20, left: 0 }}>
+                  <AreaChart data={sales} margin={{ top: 10, right: 10, bottom: 5, left: 0 }}>
                     <defs>
                       <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.4}/>
@@ -67,7 +118,7 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
                        tick={{fontFamily: 'JetBrains Mono', fontSize: 9, fill: '#94A3B8'}}
                        axisLine={false}
                        tickLine={false}
-                       interval={3}
+                       interval={0}
                     />
                     <YAxis 
                        tick={{fontFamily: 'JetBrains Mono', fontSize: 10, fill: '#94A3B8'}}
@@ -84,20 +135,30 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
                       fill="url(#salesGrad)" 
                       dot={{ r: 2, fill: '#fbbf24' }}
                       activeDot={{ r: 6, fill: '#fbbf24', strokeWidth: 0 }}
-                      animationDuration={1000}
+                      animationDuration={500}
+                    />
+                    <Brush 
+                      dataKey="week" 
+                      height={30} 
+                      stroke="#475569" 
+                      fill="#0f172a" 
+                      startIndex={range.startIndex} 
+                      endIndex={range.endIndex}
+                      onChange={(obj) => setRange(obj)}
+                      travellerWidth={10}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
               <div className="grid grid-cols-4 gap-4">
-                <KpiCard label="Peak Week" value={Math.max(...sales.map(s => s.sales))} sub="Highest units sold" icon={TrendingUp} delay={0} />
-                <KpiCard label="Average" value={(sales.reduce((a,b) => a+b.sales, 0) / sales.length).toFixed(1)} sub="Units per week" icon={Layers} delay={50} />
-                <KpiCard label="Total Sales" value={sales.reduce((a,b) => a+b.sales, 0)} sub="Total in dataset" icon={Database} accent delay={100} />
-                <KpiCard label="Frequency" value={sales.length} sub="Weeks recorded" icon={BarChart2} delay={150} />
+                <KpiCard label="Peak Week" value={peakValue} sub="Highest units sold" icon={TrendingUp} delay={0} />
+                <KpiCard label="Average" value={avgSalesValue} sub="Units per week" icon={Layers} delay={50} />
+                <KpiCard label="Total Sales" value={totalSalesValue} sub="Total units sold" icon={Database} accent delay={100} />
+                <KpiCard label="Period" value={sales.length} sub="Weeks (2025)" icon={BarChart2} delay={150} />
               </div>
             </div>
           ) : (
-            <div className="py-12">
+            <div className="py-20">
               <EmptyState icon={BarChart2} message="No sales historical data found" sub={`No rows found for SKU ${product?.sku} in sales_data_weekly.csv`} />
             </div>
           )}
@@ -368,8 +429,16 @@ export default function Forecast() {
             <div className="space-y-6">
               <div className="grid grid-cols-3 gap-4">
                 <KpiCard label="Items" value={dataset.length} sub="Rows in dataset" icon={Database} delay={0} />
-                <KpiCard label="Avg Stock" value={(dataset.reduce((a, b) => a + b.current_stock, 0) / dataset.length).toFixed(1)} sub="Across products" icon={Layers} delay={50} />
-                <KpiCard label="Avg Price" value={`₹${(dataset.reduce((a, b) => a + b.selling_price, 0) / dataset.length).toFixed(2)}`} sub="Per unit" icon={BarChart2} accent delay={100} />
+                <KpiCard 
+                  label="Avg Stock" 
+                  value={dataset.length > 0 ? (dataset.reduce((a, b) => a + b.current_stock, 0) / dataset.length).toFixed(1) : '0'} 
+                  sub="Across products" icon={Layers} delay={50} 
+                />
+                <KpiCard 
+                  label="Avg Price" 
+                  value={dataset.length > 0 ? `₹${(dataset.reduce((a, b) => a + b.selling_price, 0) / dataset.length).toFixed(2)}` : '₹0.00'} 
+                  sub="Per unit" icon={BarChart2} accent delay={100} 
+                />
               </div>
 
               <SectionCard title={activeMetric === 'current_stock' ? 'Stock Level vs Reorder Point' : 'Price vs Market Comparison'}>
