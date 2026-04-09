@@ -201,11 +201,10 @@ export default function Forecast() {
   const [showAllRows, setShowAllRows] = useState(false)
 
   useEffect(() => {
-    productsApi.list({ page_size: 100 })
-      .then((d) => setProducts(d.items ?? []))
+    forecastsApi.getProducts()
+      .then((d) => setProducts(d))
       .catch(() => { })
   }, [])
-
   useEffect(() => {
     if (mode === 'dataset' && dataset.length === 0) {
       loadDataset()

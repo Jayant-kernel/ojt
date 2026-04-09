@@ -103,6 +103,8 @@ export const forecastsApi = {
 
   list: () =>
     api.get('/forecasts').then((r) => r.data),
+  getProducts: () =>
+    api.get(`/api/forecasts/products`).then(r => r.data),
 
   metrics: (productId) =>
     api.get(`/forecasts/${productId}/metrics`).then((r) => r.data),
