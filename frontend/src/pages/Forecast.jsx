@@ -36,8 +36,8 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
   const handleScroll = (dir) => {
     const shift = 4
     const len = sales.length
-    if (len ===0) return
-    
+    if (len === 0) return
+
     if (dir === 'left') {
       const nextStart = Math.max(0, range.startIndex - shift)
       const diff = range.endIndex - range.startIndex
@@ -83,13 +83,13 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
             </div>
           ) : sales.length > 0 ? (
             <div className="space-y-6">
-              <div 
+              <div
                 className="h-[400px] w-full relative group"
                 onWheel={handleWheel}
               >
                 {/* Navigation Buttons Overlay */}
                 <div className="absolute inset-y-0 left-0 flex items-center z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button 
+                  <button
                     onClick={() => handleScroll('left')}
                     className="p-2 ml-2 bg-ink-800/80 border border-ink-600 rounded-full text-white hover:bg-amber-400 hover:text-ink-900 transition-all shadow-xl"
                   >
@@ -97,7 +97,7 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
                   </button>
                 </div>
                 <div className="absolute inset-y-0 right-0 flex items-center z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button 
+                  <button
                     onClick={() => handleScroll('right')}
                     className="p-2 mr-2 bg-ink-800/80 border border-ink-600 rounded-full text-white hover:bg-amber-400 hover:text-ink-900 transition-all shadow-xl"
                   >
@@ -109,41 +109,41 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
                   <AreaChart data={sales} margin={{ top: 10, right: 10, bottom: 5, left: 0 }}>
                     <defs>
                       <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="#fbbf24" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#fbbf24" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1E2533" vertical={false} />
-                    <XAxis 
-                       dataKey="week" 
-                       tick={{fontFamily: 'JetBrains Mono', fontSize: 9, fill: '#94A3B8'}}
-                       axisLine={false}
-                       tickLine={false}
-                       interval={0}
+                    <XAxis
+                      dataKey="week"
+                      tick={{ fontFamily: 'JetBrains Mono', fontSize: 9, fill: '#94A3B8' }}
+                      axisLine={false}
+                      tickLine={false}
+                      interval={0}
                     />
-                    <YAxis 
-                       tick={{fontFamily: 'JetBrains Mono', fontSize: 10, fill: '#94A3B8'}}
-                       axisLine={false}
-                       tickLine={false}
+                    <YAxis
+                      tick={{ fontFamily: 'JetBrains Mono', fontSize: 10, fill: '#94A3B8' }}
+                      axisLine={false}
+                      tickLine={false}
                     />
                     <Tooltip content={<ChartTooltip />} />
-                    <Area 
-                      type="monotone" 
-                      dataKey="sales" 
-                      name="Weekly Sales" 
-                      stroke="#fbbf24" 
+                    <Area
+                      type="monotone"
+                      dataKey="sales"
+                      name="Weekly Sales"
+                      stroke="#fbbf24"
                       strokeWidth={3}
-                      fill="url(#salesGrad)" 
+                      fill="url(#salesGrad)"
                       dot={{ r: 2, fill: '#fbbf24' }}
                       activeDot={{ r: 6, fill: '#fbbf24', strokeWidth: 0 }}
                       animationDuration={500}
                     />
-                    <Brush 
-                      dataKey="week" 
-                      height={30} 
-                      stroke="#475569" 
-                      fill="#0f172a" 
-                      startIndex={range.startIndex} 
+                    <Brush
+                      dataKey="week"
+                      height={30}
+                      stroke="#475569"
+                      fill="#0f172a"
+                      startIndex={range.startIndex}
                       endIndex={range.endIndex}
                       onChange={(obj) => setRange(obj)}
                       travellerWidth={10}
@@ -184,15 +184,15 @@ const ChartTooltip = ({ active, payload, label }) => {
 }
 
 export default function Forecast() {
-  const [products, setProducts]   = useState([])
+  const [products, setProducts] = useState([])
   const [productId, setProductId] = useState('')
-  const [horizon, setHorizon]     = useState(90)
-  const [loading, setLoading]     = useState(false)
-  const [forecast, setForecast]   = useState(null)
+  const [horizon, setHorizon] = useState(90)
+  const [loading, setLoading] = useState(false)
+  const [forecast, setForecast] = useState(null)
 
   // Dataset logic
-  const [mode, setMode]           = useState('forecast') // 'forecast' or 'dataset'
-  const [dataset, setDataset]     = useState([])
+  const [mode, setMode] = useState('forecast') // 'forecast' or 'dataset'
+  const [dataset, setDataset] = useState([])
   const [activeMetric, setActiveMetric] = useState('current_stock')
 
   // Drill-down logic
@@ -203,7 +203,7 @@ export default function Forecast() {
   useEffect(() => {
     productsApi.list({ page_size: 100 })
       .then((d) => setProducts(d.items ?? []))
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   useEffect(() => {
@@ -371,7 +371,7 @@ export default function Forecast() {
                   <ComposedChart data={chartData} margin={{ top: 10, right: 10, bottom: 0, left: 0 }}>
                     <defs>
                       <linearGradient id="forecastBand" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="2596be" stopOpacity={0.15} />
+                        <stop offset="5%" stopColor="2596be" stopOpacity={0.15} />
                         <stop offset="95%" stopColor="2596be" stopOpacity={0.02} />
                       </linearGradient>
                     </defs>
@@ -431,15 +431,15 @@ export default function Forecast() {
             <div className="space-y-6">
               <div className="grid grid-cols-3 gap-4">
                 <KpiCard label="Items" value={dataset.length} sub="Rows in dataset" icon={Database} delay={0} />
-                <KpiCard 
-                  label="Avg Stock" 
-                  value={dataset.length > 0 ? (dataset.reduce((a, b) => a + b.current_stock, 0) / dataset.length).toFixed(1) : '0'} 
-                  sub="Across products" icon={Layers} delay={50} 
+                <KpiCard
+                  label="Avg Stock"
+                  value={dataset.length > 0 ? (dataset.reduce((a, b) => a + b.current_stock, 0) / dataset.length).toFixed(1) : '0'}
+                  sub="Across products" icon={Layers} delay={50}
                 />
-                <KpiCard 
-                  label="Avg Price" 
-                  value={dataset.length > 0 ? `₹${(dataset.reduce((a, b) => a + b.selling_price, 0) / dataset.length).toFixed(2)}` : '₹0.00'} 
-                  sub="Per unit" icon={BarChart2} accent delay={100} 
+                <KpiCard
+                  label="Avg Price"
+                  value={dataset.length > 0 ? `₹${(dataset.reduce((a, b) => a + b.selling_price, 0) / dataset.length).toFixed(2)}` : '₹0.00'}
+                  sub="Per unit" icon={BarChart2} accent delay={100}
                 />
               </div>
 
@@ -479,7 +479,7 @@ export default function Forecast() {
                       />
                       <Tooltip content={<ChartTooltip />} />
                       <Legend verticalAlign="top" height={36} wrapperStyle={{ fontFamily: 'JetBrains Mono', fontSize: 10 }} />
-                      
+
                       {activeMetric === 'current_stock' ? (
                         <>
                           <Area
@@ -546,8 +546,8 @@ export default function Forecast() {
                     </thead>
                     <tbody>
                       {dataset.slice(0, showAllRows ? dataset.length : 10).map((item, i) => (
-                        <tr 
-                          key={i} 
+                        <tr
+                          key={i}
                           className="table-row cursor-pointer hover:bg-ink-800/50 group transition-all"
                           onClick={() => {
                             setSelectedProductForModal(item)
@@ -570,7 +570,7 @@ export default function Forecast() {
                     </tbody>
                   </table>
                   {!showAllRows && dataset.length > 10 && (
-                    <button 
+                    <button
                       onClick={() => setShowAllRows(true)}
                       className="w-full text-[10px] text-steel-500 hover:text-amber-400 font-mono text-center py-4 bg-ink-950/20 hover:bg-ink-900/40 transition-all border-t border-white/5 uppercase tracking-widest"
                     >
@@ -578,7 +578,7 @@ export default function Forecast() {
                     </button>
                   )}
                   {showAllRows && dataset.length > 10 && (
-                    <button 
+                    <button
                       onClick={() => setShowAllRows(false)}
                       className="w-full text-[10px] text-steel-500 hover:text-amber-400 font-mono text-center py-4 bg-ink-950/20 hover:bg-ink-900/40 transition-all border-t border-white/5 uppercase tracking-widest"
                     >
@@ -594,10 +594,10 @@ export default function Forecast() {
         </div>
       )}
 
-      <ProductSalesModal 
-        product={selectedProductForModal} 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      <ProductSalesModal
+        product={selectedProductForModal}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
       />
     </div>
   )
