@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react'
 import { TrendingUp, Zap, BarChart2, Database, Layers, X, LineChart, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
+  ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend, BarChart, Bar, AreaChart, Brush
 } from 'recharts'
 import { productsApi, forecastsApi, inventoryApi } from '../api/services'
