@@ -5,7 +5,7 @@ import { X, Loader2 } from 'lucide-react'
 
 // ── Spinner ───────────────────────────────────────────────────────────────────
 export function Spinner({ size = 16 }) {
-  return <Loader2 size={size} className="animate-spin text-amber-400" />
+  return <Loader2 size={size} className="animate-spin text-primary-400" />
 }
 
 // ── Page Header ───────────────────────────────────────────────────────────────
@@ -25,18 +25,18 @@ export function PageHeader({ title, subtitle, action }) {
 export function KpiCard({ label, value, sub, icon: Icon, accent = false, delay = 0 }) {
   return (
     <div
-      className={`card p-5 animate-slide-up flex flex-col gap-3 ${accent ? 'border-amber-400/30 bg-amber-400/5' : ''}`}
+      className={`card p-5 animate-slide-up flex flex-col gap-3 ${accent ? 'border-primary-400/30 bg-primary-400/5' : ''}`}
       style={{ animationDelay: `${delay}ms`, opacity: 0, animationFillMode: 'forwards' }}
     >
       <div className="flex items-center justify-between">
         <span className="font-mono text-[10px] text-steel-400 uppercase tracking-widest">{label}</span>
         {Icon && (
-          <div className={`w-7 h-7 rounded-sm flex items-center justify-center ${accent ? 'bg-amber-400/20' : 'bg-ink-700'}`}>
-            <Icon size={13} className={accent ? 'text-amber-400' : 'text-steel-400'} />
+          <div className={`w-7 h-7 rounded-sm flex items-center justify-center ${accent ? 'bg-primary-400/20' : 'bg-ink-700'}`}>
+            <Icon size={13} className={accent ? 'text-primary-400' : 'text-steel-400'} />
           </div>
         )}
       </div>
-      <div className={`font-display font-bold text-3xl ${accent ? 'text-amber-400' : 'text-white'}`}>
+      <div className={`font-display font-bold text-3xl ${accent ? 'text-primary-400' : 'text-white'}`}>
         {value}
       </div>
       {sub && <div className="font-mono text-[10px] text-steel-400">{sub}</div>}

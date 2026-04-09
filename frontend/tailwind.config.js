@@ -10,17 +10,20 @@ export default {
       },
       colors: {
         ink: {
-          950: '#080A0E',
-          900: '#0D1117',
-          800: '#161B25',
-          700: '#1E2533',
-          600: '#2A3347',
-          500: '#3D4F6B',
+          950: '#0B0B11', // Very dark background
+          900: '#111218', // Sidebar / Top bar
+          800: '#161720', // Cards
+          700: '#1E1F29', // Card hover / borders
+          600: '#2A2C3A',
+          500: '#3D4155',
         },
-        amber: {
-          400: '#2596be',
-          300: '#36fdc89f',
-          500: '#2596be',
+        primary: {
+          500: '#A955FF', // Magenta/Purple accent
+          400: '#B872FF',
+          600: '#913DED',
+        },
+        secondary: {
+          500: '#3A2E70', // Darker purple highlight
         },
         steel: {
           400: '#94A3B8',
