@@ -1,7 +1,7 @@
 /**
  * Forecast page — select a product, trigger forecast, display predictions + metrics.
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { TrendingUp, Zap, BarChart2, Database, Layers, X, LineChart, ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import {
   ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid,
@@ -606,7 +606,7 @@ export default function Forecast() {
                   {showAllRows && dataset.length > 10 && (
                     <button
                       onClick={() => setShowAllRows(false)}
-                      className="w-full text-[10px] text-steel-500 hover:text-amber-400 font-mono text-center py-4 bg-ink-950/20 hover:bg-ink-900/40 transition-all border-t border-white/5 uppercase tracking-widest"
+                      className="w-full text-[10px] text-steel hover:text-white font-mono text-center py-4 bg-white/5 hover:bg-white/10 transition-all border-t border-white/5 uppercase tracking-widest"
                     >
                       Collapse list
                     </button>
