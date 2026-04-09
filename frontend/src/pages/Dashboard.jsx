@@ -40,6 +40,15 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
   }, [])
 
+  // Data for sparklines based on timeRange
+  const { sparkline1, sparkline2 } = useMemo(() => {
+    const points = timeRange === '24H' ? 6 : timeRange === '7D' ? 14 : 30
+    return {
+      sparkline1: generateSparkline(points, 50, 30),
+      sparkline2: generateSparkline(points, 20, 10)
+    }
+  }, [timeRange])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -55,15 +64,6 @@ export default function Dashboard() {
     setLowStock((prev) => prev.filter((item) => item.id !== id))
     toast.success('Alert dismissed')
   }
-
-  // Data for sparklines based on timeRange
-  const { sparkline1, sparkline2 } = useMemo(() => {
-    const points = timeRange === '24H' ? 6 : timeRange === '7D' ? 14 : 30
-    return {
-      sparkline1: generateSparkline(points, 50, 30),
-      sparkline2: generateSparkline(points, 20, 10)
-    }
-  }, [timeRange])
 
   return (
     <div className="relative z-0">
