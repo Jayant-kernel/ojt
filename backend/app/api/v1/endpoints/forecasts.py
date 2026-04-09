@@ -60,24 +60,29 @@ async def get_forecast_products():
         return products
 
     try:
-        # Build a name mapping from inventory.csv
+        # Build a robust name mapping from inventory.csv using Pandas
         name_map = {}
         inv_path = get_csv_path(INVENTORY_PATHS)
         if inv_path:
-            with open(inv_path, encoding="utf-8") as f:
-                r = csv.DictReader(f)
-                for row in r:
-                    id_val = row.get("Product_ID")
-                    if id_val:
-                        name_map[id_val] = row.get("Product_Name", id_val)
+            try:
+                inv_df = pd.read_csv(inv_path)
+                # Map SKU (Product_ID) to Name (Product_Name)
+                if "Product_ID" in inv_df.columns and "Product_Name" in inv_df.columns:
+                    name_map = {
+                        str(sku).strip(): str(name).strip()
+                        for sku, name in zip(inv_df["Product_ID"], inv_df["Product_Name"])
+                        if pd.notna(sku)
+                    }
+            except Exception:
+                pass # Fallback to empty map if inventory.csv fails
 
         df = pd.read_csv(csv_path)
         skus = sorted(df["product_name"].dropna().unique().tolist())
         return [
             {
-                "id": sku, 
-                "name": name_map.get(sku, sku), 
-                "sku": sku, 
+                "id": str(sku).strip(), 
+                "name": name_map.get(str(sku).strip(), str(sku).strip()), 
+                "sku": str(sku).strip(), 
                 "category": ""
             } for sku in skus
         ]

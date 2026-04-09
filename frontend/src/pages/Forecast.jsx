@@ -2,7 +2,7 @@
  * Forecast page — select a product, trigger forecast, display predictions + metrics.
  */
 import { useState, useEffect } from 'react'
-import { TrendingUp, Zap, BarChart2, Database, Layers, X, LineChart, ChevronLeft, ChevronRight } from 'lucide-react'
+import { TrendingUp, Zap, BarChart2, Database, Layers, X, LineChart, ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import {
   ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend, BarChart, Bar, AreaChart, Brush
@@ -199,6 +199,16 @@ export default function Forecast() {
   const [selectedProductForModal, setSelectedProductForModal] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showAllRows, setShowAllRows] = useState(false)
+  const [productSearch, setProductSearch] = useState('')
+
+  const filteredProducts = useMemo(() => {
+    if (!productSearch.trim()) return products
+    const s = productSearch.toLowerCase()
+    return products.filter(p => 
+      p.name.toLowerCase().includes(s) || 
+      p.sku.toLowerCase().includes(s)
+    )
+  }, [products, productSearch])
 
   useEffect(() => {
     forecastsApi.getProducts()
@@ -304,10 +314,24 @@ export default function Forecast() {
           <SectionCard title="Generate Forecast">
             <div className="flex flex-wrap items-end gap-4">
               <div className="flex-1 min-w-48">
-                <Field label="Product">
+                <Field label="Product Search">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-steel-500" size={14} />
+                    <input 
+                      type="text"
+                      className="input pl-9"
+                      placeholder="Search name or SKU…"
+                      value={productSearch}
+                      onChange={(e) => setProductSearch(e.target.value)}
+                    />
+                  </div>
+                </Field>
+              </div>
+              <div className="flex-1 min-w-48">
+                <Field label="Select Product">
                   <select className="input" value={productId} onChange={(e) => setProductId(e.target.value)}>
-                    <option value="">Select product…</option>
-                    {products.map(p => (
+                    <option value="">{filteredProducts.length > 0 ? 'Select product…' : 'No matches found'}</option>
+                    {filteredProducts.map(p => (
                       <option key={p.id} value={p.id}>{p.sku} ({p.name})</option>
                     ))}
                   </select>
