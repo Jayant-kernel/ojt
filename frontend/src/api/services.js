@@ -98,9 +98,11 @@ export const salesApi = {
 export const forecastsApi = {
   // GET /api/products — returns all products for the dropdown
   // Expected shape: [{ id, sku, name, category }]
-  getProducts: () =>
-    api.get('/products').then(r => r.data),
- 
+ getProducts: () =>
+  api.get('/products').then(r => {
+    console.log('products response:', r.data)  // <-- add this
+    return r.data
+  })
   // POST /api/forecasts/generate
   // Body: { product_id, horizon_days }
   // Expected shape: { status, model_name, horizon_days, forecast_from, forecast_to,
