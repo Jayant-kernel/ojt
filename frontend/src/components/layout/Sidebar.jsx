@@ -31,24 +31,9 @@ export default function Sidebar() {
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white/[0.03] backdrop-blur-[24px] border-r border-white/10 flex flex-col z-40 shadow-2xl">
-      {/* Logo */}
-      <div className="px-6 py-8">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(100,160,255,0.3)] border border-white/20">
-            <Activity size={20} className="text-white" strokeWidth={2.5} />
-          </div>
-          <div>
-            <div className="font-display font-bold text-xl text-white mr-1 flex items-center gap-1">
-              SIFS<span className="text-blue-400 text-xs">®</span>
-            </div>
-            <div className="font-mono text-[9px] text-steel tracking-[0.2em] mt-1 uppercase">Intelli-Core</div>
-          </div>
-        </div>
-      </div>
-
       {/* Nav */}
       <nav className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
-        <div className="text-[10px] font-mono text-white/30 uppercase tracking-[0.2em] mb-4 px-3">Protocol Navigation</div>
+        <div className="text-[10px] font-mono text-white/30 uppercase tracking-[0.2em] mb-4 px-3">Navigation</div>
         {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}

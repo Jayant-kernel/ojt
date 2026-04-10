@@ -208,11 +208,11 @@ export default function Dashboard() {
           ) : (
             <div className="">
               <div className="list-header hidden md:flex border-b border-white/10 bg-white/[0.02] px-8 py-5">
-                <div className="w-2/5">Asset Detail</div>
-                <div className="w-1/5 text-right">Available units</div>
-                <div className="w-1/5 text-right">Threshold</div>
-                <div className="w-1/5 text-center">Protocol Status</div>
-                <div className="w-1/5 text-right">Directives</div>
+                <div className="w-[35%] px-4">Asset Detail</div>
+                <div className="w-[15%] px-4 text-right font-bold uppercase">Stock</div>
+                <div className="w-[15%] px-4 text-right font-bold uppercase">Threshold</div>
+                <div className="w-[20%] px-4 text-center font-bold uppercase">Status</div>
+                <div className="w-[15%] px-4 text-right font-bold uppercase">Directives</div>
               </div>
               
               <div className="divide-y divide-white/[0.03]">
@@ -220,38 +220,38 @@ export default function Dashboard() {
                   <div key={p.id} className="list-row flex-col md:flex-row items-start md:items-center gap-4 md:gap-0 px-8 py-6 hover:bg-white/[0.03] transition-colors relative group/row">
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover/row:scale-y-100 transition-transform origin-top" />
                     
-                    <div className="w-full md:w-2/5 flex items-center gap-5">
+                    <div className="w-full md:w-[35%] flex items-center gap-5">
                       <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/10 shrink-0 shadow-inner group-hover/row:border-primary/20 transition-colors">
                         <Package size={20} className="text-steel group-hover/row:text-primary transition-colors" />
                       </div>
-                      <div>
-                        <div className="font-display font-bold text-white text-base mb-1">{p.name}</div>
+                      <div className="min-w-0">
+                        <div className="font-display font-bold text-white text-base mb-1 truncate">{p.name}</div>
                         <div className="text-[10px] font-mono text-steel uppercase tracking-[0.2em] font-medium">Ref: {p.sku}</div>
                       </div>
                     </div>
                     
-                    <div className="w-full md:w-1/5 md:text-right font-display text-2xl font-black text-white tracking-tighter px-4">
+                    <div className="w-full md:w-[15%] md:text-right font-display text-2xl font-black text-white px-4">
                       {p.current_stock}
                     </div>
                     
-                    <div className="w-full md:w-1/5 md:text-right text-steel font-mono text-xs uppercase tracking-widest px-4 font-bold">
+                    <div className="w-full md:w-[15%] md:text-right text-steel font-mono text-xs uppercase tracking-widest px-4 font-bold">
                       {p.reorder_point ?? '—'}
                     </div>
                     
-                    <div className="w-full md:w-1/5 md:text-center px-4">
+                    <div className="w-full md:w-[20%] md:text-center px-4">
                       {p.current_stock === 0
-                        ? <span className="badge-danger">CRITICAL: EMPTY</span>
-                        : <span className="badge-warning">WARNING: DEPLETING</span>
+                        ? <span className="badge-danger w-full text-center">CRITICAL: EMPTY</span>
+                        : <span className="badge-warning w-full text-center">WARNING: LOW</span>
                       }
                     </div>
   
-                    <div className="w-full md:w-1/5 flex justify-start md:justify-end gap-3 px-4">
-                      <button className="btn-primary !px-5 !py-2 text-[11px] font-black uppercase tracking-widest">
+                    <div className="w-full md:w-[15%] flex justify-start md:justify-end gap-2 px-4">
+                      <button className="btn-primary !px-3 !py-2 text-[10px] flex-1">
                         Refill
                       </button>
                       <button 
                         onClick={() => handleDismiss(p.id)}
-                        className="btn-ghost !px-4 !py-2 text-[10px] font-bold uppercase tracking-widest text-steel/60 hover:text-white"
+                        className="btn-ghost !px-3 !py-2 text-[10px] text-steel/60 hover:text-white flex-1"
                       >
                         Ignore
                       </button>
