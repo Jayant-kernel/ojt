@@ -107,8 +107,8 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Card 1 */}
-        <div className="card p-6 relative overflow-hidden group bg-[rgba(60,100,220,0.1)] border-t-[rgba(120,180,255,0.4)]">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="card p-5 h-full flex flex-col relative overflow-hidden group bg-[rgba(60,100,220,0.1)] border-t-[rgba(120,180,255,0.4)] hover:![background:rgba(60,100,220,0.15)] hover:!border-[rgba(120,180,255,0.5)]">
+          <div className="flex items-center gap-3 mb-4">
              <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/30 shadow-[0_0_15px_rgba(100,160,255,0.2)]">
                <Package size={14} className="text-blue-400" />
              </div>
@@ -116,7 +116,7 @@ export default function Dashboard() {
                <div className="text-[10px] font-mono text-steel uppercase tracking-[0.2em]">Total Products</div>
              </div>
           </div>
-          <div className="flex items-end justify-between z-10 relative">
+          <div className="flex items-end justify-between z-10 relative mt-auto">
             <div>
               <div className="font-display font-medium text-4xl text-white mb-2 tracking-tight">{fmt(stats?.total_products)}</div>
               <div className="text-[10px] font-mono text-success flex items-center gap-1.5"><span className="px-1.5 py-0.5 rounded bg-success/10 border border-success/20">+4.2%</span> <TrendingUp size={12} /></div>
@@ -139,8 +139,8 @@ export default function Dashboard() {
         </div>
 
         {/* Card 2 */}
-        <div className="card p-6 relative overflow-hidden bg-[rgba(200,140,30,0.08)] border-t-[rgba(245,158,11,0.4)]">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="card p-5 h-full flex flex-col relative overflow-hidden bg-[rgba(200,140,30,0.08)] border-t-[rgba(245,158,11,0.4)] hover:![background:rgba(239,68,68,0.12)] hover:!border-[rgba(239,68,68,0.5)]">
+          <div className="flex items-center gap-3 mb-4">
              <div className="w-8 h-8 rounded-xl bg-warning/10 flex items-center justify-center border border-warning/30 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
                <AlertTriangle size={14} className="text-warning" />
              </div>
@@ -148,7 +148,7 @@ export default function Dashboard() {
                <div className="text-[10px] font-mono text-steel uppercase tracking-[0.2em]">Low Stock Alert</div>
              </div>
           </div>
-          <div className="flex items-end justify-between z-10 relative">
+          <div className="flex items-end justify-between z-10 relative mt-auto">
             <div>
               <div className="font-display font-medium text-4xl text-white mb-2 tracking-tight">{fmt(stats?.low_stock_count)}</div>
               <div className="text-[10px] font-mono text-danger flex items-center gap-1.5"><span className="px-1.5 py-0.5 rounded bg-danger/10 border border-danger/20">-1.5%</span> <TrendingUp size={12} className="rotate-180" /></div>
@@ -171,24 +171,21 @@ export default function Dashboard() {
         </div>
 
         {/* Card 3 */}
-        <div className="card p-6 relative overflow-hidden bg-[rgba(100,50,200,0.12)] border-t-[rgba(160,120,255,0.4)] shadow-2xl">
-           <div className="absolute -top-16 -right-16 w-40 h-40 bg-purple-500 rounded-full blur-[80px] opacity-20"></div>
+        <div className="card p-5 h-full flex flex-col relative overflow-hidden bg-[rgba(100,50,200,0.12)] border-t-[rgba(160,120,255,0.4)] shadow-2xl hover:![background:rgba(100,50,200,0.2)] hover:!border-[rgba(160,120,255,0.5)]">
+           <div className="absolute -top-16 -right-16 w-32 h-32 bg-purple-500 rounded-full blur-[80px] opacity-20"></div>
            
            <div className="relative z-10 flex flex-col h-full justify-between">
               <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="bg-white/10 px-2.5 py-1 rounded text-[9px] uppercase font-mono font-black text-white border border-white/10">Active Audit</div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-display text-sm font-bold text-white tracking-wide">Inventory Value</h3>
+                  <div className="bg-white/10 px-2.5 py-0.5 rounded text-[8px] uppercase font-mono font-black text-white border border-white/10">Active Audit</div>
                 </div>
-                <h3 className="font-display text-base font-bold text-white mb-2 tracking-wide">Inventory Value Portfolio</h3>
-                <p className="text-[11px] text-steel font-mono mb-6 leading-relaxed bg-white/[0.03] p-3 rounded-xl border border-white/5">
-                  Live valuation across all linked warehouses.
-                </p>
-                <div className="font-display font-black text-4xl text-white mb-8 drop-shadow-2xl">
+                <div className="font-display font-black text-3xl text-white mb-5 drop-shadow-2xl mt-1">
                   {fmtCurrency(stats?.total_inventory_value)}
                 </div>
               </div>
-              <button className="w-full btn-primary gap-2 !py-3">
-                <span className="font-mono text-[11px] font-black tracking-widest uppercase">Inspect Portfolio</span> <ChevronRight size={14} />
+              <button className="w-full btn-primary gap-2 !py-2.5 mt-auto">
+                <span className="font-mono text-[10px] font-black tracking-widest uppercase">Inspect Portfolio</span> <ChevronRight size={14} />
               </button>
            </div>
         </div>
