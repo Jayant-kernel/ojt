@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 import pandas as pd
 from prophet import Prophet
@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 
 # ── GET /forecasts/products ───────────────────────────────────────────────────
 @router.get("/products")
-async def get_forecast_products(db: Session = Depends(get_db)):
+async def get_forecast_products(db: AsyncSession = Depends(get_db)):
     """Distinct product IDs from sales_history joined with products table."""
     try:
-        rows = db.execute(text("""
+        result = await db.execute(text("""
             SELECT DISTINCT
                 p.id,
                 p.sku,
@@ -29,7 +29,8 @@ async def get_forecast_products(db: Session = Depends(get_db)):
             JOIN products p ON p.sku = sh.product_id
             LEFT JOIN categories c ON c.id = p.category_id
             ORDER BY p.name ASC
-        """)).fetchall()
+        """))
+        rows = result.fetchall()
 
         return [
             {
@@ -47,8 +48,8 @@ async def get_forecast_products(db: Session = Depends(get_db)):
 
 # ── POST /forecasts/generate ──────────────────────────────────────────────────
 @router.post("/generate")
-async def generate_forecast(body: Dict[str, Any], db: Session = Depends(get_db)):
-    product_id = body.get("product_id")  # this is the UUID from products.id
+async def generate_forecast(body: Dict[str, Any], db: AsyncSession = Depends(get_db)):
+    product_id = body.get("product_id")
     horizon    = int(body.get("horizon_days", 90))
 
     if not product_id:
@@ -56,20 +57,22 @@ async def generate_forecast(body: Dict[str, Any], db: Session = Depends(get_db))
 
     try:
         # Look up the SKU for this product UUID
-        product = db.execute(text("""
+        result = await db.execute(text("""
             SELECT sku, name FROM products WHERE id = :pid
-        """), {"pid": product_id}).fetchone()
+        """), {"pid": product_id})
+        product = result.fetchone()
 
         if not product:
             raise HTTPException(status_code=404, detail="Product not found")
 
         # Fetch weekly sales from sales_history using SKU
-        rows = db.execute(text("""
+        result = await db.execute(text("""
             SELECT week_start_date AS ds, sales AS y
             FROM sales_history
             WHERE product_id = :sku
             ORDER BY week_start_date ASC
-        """), {"sku": product.sku}).fetchall()
+        """), {"sku": product.sku})
+        rows = result.fetchall()
 
         if not rows:
             raise HTTPException(
@@ -158,15 +161,16 @@ async def generate_forecast(body: Dict[str, Any], db: Session = Depends(get_db))
 
 # ── GET /forecasts/sales-history/{product_id} ─────────────────────────────────
 @router.get("/sales-history/{product_id}")
-async def get_sales_history(product_id: str, db: Session = Depends(get_db)):
+async def get_sales_history(product_id: str, db: AsyncSession = Depends(get_db)):
     """Weekly sales history for a product SKU — used by the modal chart."""
     try:
-        rows = db.execute(text("""
+        result = await db.execute(text("""
             SELECT year_week AS week, sales
             FROM sales_history
             WHERE product_id = :pid
             ORDER BY week_start_date ASC
-        """), {"pid": product_id}).fetchall()
+        """), {"pid": product_id})
+        rows = result.fetchall()
 
         return [{"week": row.week, "sales": row.sales} for row in rows]
     except Exception as e:
