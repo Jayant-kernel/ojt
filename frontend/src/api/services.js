@@ -94,29 +94,33 @@ export const salesApi = {
 }
 
 // ── Forecasts ─────────────────────────────────────────────────────────────────
+
 export const forecastsApi = {
-  generate: (productId, horizonDays = 90) =>
-    api.post('/forecasts/generate', {
-      product_id: productId,
-      horizon_days: horizonDays
-    }).then((r) => r.data),
-
+  // GET /api/products — returns all products for the dropdown
+  // Expected shape: [{ id, sku, name, category }]
   getProducts: () =>
-    api.get('/forecasts/products').then(r => r.data),
-
-  get: (productId) =>
-    api.get(`/forecasts/${productId}/latest`).then((r) => r.data),
-
-  list: () =>
-    api.get('/forecasts').then((r) => r.data),
-
-  metrics: (productId) =>
-    api.get(`/forecasts/${productId}/metrics`).then((r) => r.data),
+    api.get('/products').then(r => r.data),
+ 
+  // POST /api/forecasts/generate
+  // Body: { product_id, horizon_days }
+  // Expected shape: { status, model_name, horizon_days, forecast_from, forecast_to,
+  //                   mae, rmse, mape, predictions: [{ ds, yhat, yhat_lower, yhat_upper }] }
+  generate: (productId, horizonDays) =>
+    api.post('/forecasts/generate', { product_id: productId, horizon_days: horizonDays }).then(r => r.data),
 }
-// ── Inventory Dataset ─────────────────────────────────────────────────────────
+ 
+// ─── inventoryApi ─────────────────────────────────────────────────────────────
+ 
 export const inventoryApi = {
+  // GET /api/products — with full inventory fields
+  // Expected shape: [{ sku, name, category, selling_price, current_stock, reorder_point }]
   getDataset: () =>
-    api.get('/inventory/dataset').then((r) => r.data),
-  getProductSales: (sku) =>
-    api.get(`/inventory/sales/${sku}`).then((r) => r.data),
+    api.get('/products').then(r => r.data),
+ 
+  // GET /api/sales-history/:productId
+  // Expected shape: [{ week: '2025-W03', sales: 214 }, ...]
+  // week comes from year_week column in sales_history table
+  getProductSales: (productId) =>
+    api.get(`/sales-history/${productId}`).then(r => r.data),
 }
+ 
