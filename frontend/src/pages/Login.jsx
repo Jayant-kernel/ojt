@@ -45,33 +45,25 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
       {/* Ambient background glows */}
-      <div className="fixed top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
-      <div className="fixed bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="fixed top-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[160px] pointer-events-none -z-10" />
+      <div className="fixed bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[160px] pointer-events-none -z-10" />
 
       <div className="relative w-full max-w-[420px] animate-slide-up">
-        {/* Logo */}
-        <div className="flex flex-col items-center gap-6 mb-12">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-[0_0_30px_rgba(100,160,255,0.3)] border border-white/20 transform rotate-45">
-             <div className="-rotate-45">
-               <Activity size={32} className="text-white" strokeWidth={2.5} />
-             </div>
-          </div>
-          <div className="text-center">
-            <h1 className="font-display font-black text-4xl text-white tracking-widest flex items-center gap-2 justify-center">
-              SIFS<span className="text-blue-400 text-xs font-mono">®</span>
-            </h1>
-            <p className="font-mono text-[10px] text-steel tracking-[0.4em] mt-2 uppercase">Intelligent Inventory Protocol</p>
-          </div>
+        {/* Simplified Header */}
+        <div className="flex flex-col items-center mb-10">
+          <h1 className="font-display font-black text-5xl text-white tracking-[0.2em] drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+            SIFS
+          </h1>
         </div>
 
-        <div className="card p-8 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500" />
+        <div className="relative bg-white/[0.01] backdrop-blur-[40px] border border-white/10 rounded-[32px] p-10 overflow-hidden shadow-2xl">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/30 to-purple-500/30" />
           
           <div className="mb-10 text-center">
-             <h2 className="font-display font-black text-xl text-white mb-2 uppercase tracking-wide">Secure Access</h2>
-             <div className="flex items-center justify-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_#22C55E]" />
-                <p className="font-mono text-[10px] text-steel uppercase tracking-widest font-bold">Terminal Online</p>
+             <h2 className="font-display font-black text-xl text-white/90 mb-2 uppercase tracking-[0.2em]">Secure Access</h2>
+             <div className="flex items-center justify-center gap-2 opacity-50">
+                <div className="w-1.5 h-1.5 rounded-full bg-success" />
+                <p className="font-mono text-[9px] text-steel uppercase tracking-widest font-bold">Terminal Online</p>
              </div>
           </div>
 
