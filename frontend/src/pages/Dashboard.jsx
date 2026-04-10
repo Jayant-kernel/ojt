@@ -217,10 +217,10 @@ export default function Dashboard() {
               
               <div className="divide-y divide-white/[0.03]">
                 {lowStock.map((p) => (
-                  <div key={p.id} className="list-row flex-col md:flex-row items-start md:items-center gap-4 md:gap-0 px-8 py-6 hover:bg-white/[0.03] transition-colors relative group/row">
+                  <div key={p.id} className="list-row flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-0 px-8 py-6 hover:bg-white/[0.03] transition-colors relative group/row">
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover/row:scale-y-100 transition-transform origin-top" />
                     
-                    <div className="w-full md:w-[35%] flex items-center gap-5">
+                    <div className="w-full md:w-[35%] flex items-center gap-5 px-4">
                       <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/10 shrink-0 shadow-inner group-hover/row:border-primary/20 transition-colors">
                         <Package size={20} className="text-steel group-hover/row:text-primary transition-colors" />
                       </div>
