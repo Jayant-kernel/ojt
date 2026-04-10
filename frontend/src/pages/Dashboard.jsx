@@ -107,7 +107,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Card 1 */}
-        <div className="card p-5 h-full flex flex-col relative overflow-hidden group bg-[rgba(60,100,220,0.1)] border-t-[rgba(120,180,255,0.4)] hover:![background:rgba(60,100,220,0.15)] hover:!border-[rgba(120,180,255,0.5)]">
+        <div className="card p-5 h-full flex flex-col relative overflow-hidden group bg-[rgba(60,100,220,0.1)] border-t-[rgba(120,180,255,0.4)] hover:![background:rgba(60,100,220,0.15)] hover:!border-[rgba(120,180,255,0.5)] hover:!shadow-[0_0_40px_rgba(60,100,220,0.25)]">
           <div className="flex items-center gap-3 mb-4">
              <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/30 shadow-[0_0_15px_rgba(100,160,255,0.2)]">
                <Package size={14} className="text-blue-400" />
@@ -139,7 +139,7 @@ export default function Dashboard() {
         </div>
 
         {/* Card 2 */}
-        <div className="card p-5 h-full flex flex-col relative overflow-hidden bg-[rgba(200,140,30,0.08)] border-t-[rgba(245,158,11,0.4)] hover:![background:rgba(239,68,68,0.12)] hover:!border-[rgba(239,68,68,0.5)]">
+        <div className="card p-5 h-full flex flex-col relative overflow-hidden bg-[rgba(200,140,30,0.08)] border-t-[rgba(245,158,11,0.4)] hover:![background:rgba(200,140,30,0.12)] hover:!border-warning/30 hover:!shadow-[0_0_30px_rgba(245,158,11,0.15)]">
           <div className="flex items-center gap-3 mb-4">
              <div className="w-8 h-8 rounded-xl bg-warning/10 flex items-center justify-center border border-warning/30 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
                <AlertTriangle size={14} className="text-warning" />
