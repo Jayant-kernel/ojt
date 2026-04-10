@@ -1,90 +1,40 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any
-import csv
-import os
+from sqlalchemy.orm import Session
+from sqlalchemy import text
 import pandas as pd
 from prophet import Prophet
-from pathlib import Path
+
+from app.api.deps import get_db
 
 router = APIRouter(prefix="/forecasts", tags=["Forecasts"])
-
-BASE_DIR = Path(__file__).parent.parent.parent.parent.parent
-POSSIBLE_CSV_PATHS = [
-    BASE_DIR / "sales_data_weekly.csv",
-    Path(os.getcwd()) / "sales_data_weekly.csv",
-    Path(os.getcwd()) / "backend" / "sales_data_weekly.csv",
-]
-
-INVENTORY_PATHS = [
-    BASE_DIR / "inventory.csv",
-    Path(os.getcwd()) / "inventory.csv",
-    Path(os.getcwd()) / "backend" / "inventory.csv",
-]
-
-
-def get_csv_path(paths):
-    for p in paths:
-        if p.exists():
-            return p
-    return None
-
-
-def parse_year_week(yw: str) -> pd.Timestamp:
-    year, week = yw.split("-")
-    week_num = max(1, int(week))  # treat week 00 as week 1
-    return pd.Timestamp.fromisocalendar(int(year), week_num, 1)
 
 
 # ── GET /forecasts/products ───────────────────────────────────────────────────
 @router.get("/products")
-async def get_forecast_products():
-    """Distinct product names from sales_data_weekly.csv for the dropdown."""
-    csv_path = get_csv_path(POSSIBLE_CSV_PATHS)
-    if not csv_path:
-        # fallback to inventory.csv if sales csv not found
-        csv_path = get_csv_path(INVENTORY_PATHS)
-        if not csv_path:
-            return []
-        products = []
-        with open(csv_path, encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                sku = row.get("Product_ID")
-                if sku:
-                    products.append({
-                        "id": sku,
-                        "name": row.get("Product_Name", sku),
-                        "sku": sku,
-                        "category": row.get("Catagory", "Uncategorized"),
-                    })
-        return products
-
+async def get_forecast_products(db: Session = Depends(get_db)):
+    """Distinct product IDs from sales_history joined with products table."""
     try:
-        # Build a robust name mapping from inventory.csv using Pandas
-        name_map = {}
-        inv_path = get_csv_path(INVENTORY_PATHS)
-        if inv_path:
-            try:
-                inv_df = pd.read_csv(inv_path)
-                # Map SKU (Product_ID) to Name (Product_Name)
-                if "Product_ID" in inv_df.columns and "Product_Name" in inv_df.columns:
-                    name_map = {
-                        str(sku).strip(): str(name).strip()
-                        for sku, name in zip(inv_df["Product_ID"], inv_df["Product_Name"])
-                        if pd.notna(sku)
-                    }
-            except Exception:
-                pass # Fallback to empty map if inventory.csv fails
+        rows = db.execute(text("""
+            SELECT DISTINCT
+                p.id,
+                p.sku,
+                p.name,
+                COALESCE(c.name, 'Uncategorized') AS category
+            FROM sales_history sh
+            JOIN products p ON p.sku = sh.product_id
+            LEFT JOIN categories c ON c.id = p.category_id
+            ORDER BY p.name ASC
+        """)).fetchall()
 
-        df = pd.read_csv(csv_path)
-        skus = sorted(df["product_name"].dropna().unique().tolist())
         return [
             {
-                "id": str(sku).strip(), 
-                "name": name_map.get(str(sku).strip(), str(sku).strip()), 
-                "sku": str(sku).strip(), 
-                "category": ""
-            } for sku in skus
+                "id":       str(row.id),
+                "sku":      row.sku,
+                "name":     row.name,
+                "category": row.category,
+            }
+            for row in rows
         ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -92,43 +42,62 @@ async def get_forecast_products():
 
 # ── POST /forecasts/generate ──────────────────────────────────────────────────
 @router.post("/generate")
-async def generate_forecast(body: Dict[str, Any]):
-    product_id = body.get("product_id")
+async def generate_forecast(body: Dict[str, Any], db: Session = Depends(get_db)):
+    product_id = body.get("product_id")  # this is the UUID from products.id
     horizon    = int(body.get("horizon_days", 90))
 
     if not product_id:
         raise HTTPException(status_code=400, detail="product_id is required")
 
-    csv_path = get_csv_path(POSSIBLE_CSV_PATHS)
-    if not csv_path:
-        raise HTTPException(status_code=404, detail="sales_data_weekly.csv not found")
-
     try:
-        df = pd.read_csv(csv_path)
-        df_filtered = df[df["product_name"] == product_id][["year_week", "sales"]].rename(
-            columns={"year_week": "ds", "sales": "y"}
-        )
+        # Look up the SKU for this product UUID
+        product = db.execute(text("""
+            SELECT sku, name FROM products WHERE id = :pid
+        """), {"pid": product_id}).fetchone()
 
-        if df_filtered.empty:
-            raise HTTPException(status_code=404, detail=f"No data for: {product_id}")
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
 
-        df_filtered["ds"] = df_filtered["ds"].apply(parse_year_week)
-        df_filtered["y"]  = pd.to_numeric(df_filtered["y"], errors="coerce")
-        df_filtered.dropna(inplace=True)
-        df_filtered.sort_values("ds", inplace=True)
+        # Fetch weekly sales from sales_history using SKU
+        rows = db.execute(text("""
+            SELECT week_start_date AS ds, sales AS y
+            FROM sales_history
+            WHERE product_id = :sku
+            ORDER BY week_start_date ASC
+        """), {"sku": product.sku}).fetchall()
 
+        if not rows:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No sales history found for product: {product.name}"
+            )
+
+        # Build dataframe
+        df = pd.DataFrame([{"ds": row.ds, "y": float(row.y)} for row in rows])
+        df["ds"] = pd.to_datetime(df["ds"])
+        df.dropna(inplace=True)
+        df.sort_values("ds", inplace=True)
+
+        if len(df) < 2:
+            raise HTTPException(
+                status_code=400,
+                detail="Not enough data points to generate a forecast (need at least 2 weeks)"
+            )
+
+        # Fit Prophet
         model = Prophet(
             yearly_seasonality=True,
             weekly_seasonality=True,
             daily_seasonality=False,
             seasonality_mode="multiplicative",
         )
-        model.fit(df_filtered)
+        model.fit(df)
 
         future   = model.make_future_dataframe(periods=horizon, freq="D")
         forecast = model.predict(future)
 
-        future_only = forecast[forecast["ds"] > df_filtered["ds"].max()]
+        # Only return future predictions (beyond training data)
+        future_only = forecast[forecast["ds"] > df["ds"].max()]
 
         predictions = [
             {
@@ -140,12 +109,12 @@ async def generate_forecast(body: Dict[str, Any]):
             for _, row in future_only.iterrows()
         ]
 
-        # Metrics on historical fit
-        hist   = forecast[forecast["ds"] <= df_filtered["ds"].max()].copy()
-        merged = df_filtered.merge(hist[["ds", "yhat"]], on="ds", how="inner")
-        mae    = float((merged["y"] - merged["yhat"]).abs().mean())
-        rmse   = float(((merged["y"] - merged["yhat"]) ** 2).mean() ** 0.5)
-        mape   = float(
+        # Compute metrics on historical fit
+        hist   = forecast[forecast["ds"] <= df["ds"].max()].copy()
+        merged = df.merge(hist[["ds", "yhat"]], on="ds", how="inner")
+        mae  = float((merged["y"] - merged["yhat"]).abs().mean())
+        rmse = float(((merged["y"] - merged["yhat"]) ** 2).mean() ** 0.5)
+        mape = float(
             ((merged["y"] - merged["yhat"]).abs() / merged["y"].replace(0, 1)).mean() * 100
         )
 
@@ -163,5 +132,22 @@ async def generate_forecast(body: Dict[str, Any]):
 
     except HTTPException:
         raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── GET /forecasts/sales-history/{product_id} ─────────────────────────────────
+@router.get("/sales-history/{product_id}")
+async def get_sales_history(product_id: str, db: Session = Depends(get_db)):
+    """Weekly sales history for a product SKU — used by the modal chart."""
+    try:
+        rows = db.execute(text("""
+            SELECT year_week AS week, sales
+            FROM sales_history
+            WHERE product_id = :pid
+            ORDER BY week_start_date ASC
+        """), {"pid": product_id}).fetchall()
+
+        return [{"week": row.week, "sales": row.sales} for row in rows]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
