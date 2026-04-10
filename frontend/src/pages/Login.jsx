@@ -120,13 +120,6 @@ export default function LoginPage() {
             </div>
           </form>
         </div>
-
-        <div className="flex flex-col items-center mt-12 gap-3 opacity-30">
-          <div className="w-px h-8 bg-gradient-to-b from-transparent to-white/40" />
-          <p className="font-mono text-[9px] text-steel text-center tracking-[0.5em] uppercase">
-            Core Engine v2.4.0 — Secured Connection
-          </p>
-        </div>
       </div>
     </div>
   )
