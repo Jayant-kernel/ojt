@@ -43,34 +43,26 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Ambient background glows */}
-      <div className="fixed top-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[160px] pointer-events-none -z-10" />
-      <div className="fixed bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[160px] pointer-events-none -z-10" />
+    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-[#050505]">
+      {/* Target Cosmic Planet Background */}
+      <div className="planet" />
+      
+      {/* Background Star Field (Subtle CSS) */}
+      <div className="fixed inset-0 pointer-events-none opacity-20 -z-10" 
+           style={{ backgroundImage: 'radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)), radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)), radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0))', backgroundSize: '200px 200px' }} />
 
-      <div className="relative w-full max-w-[420px] animate-slide-up">
-        {/* Simplified Header */}
-        <div className="flex flex-col items-center mb-10">
-          <h1 className="font-display font-black text-5xl text-white tracking-[0.2em] drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-            SIFS
-          </h1>
-        </div>
-
-        <div className="relative bg-white/[0.01] backdrop-blur-[40px] border border-white/10 rounded-[32px] p-10 overflow-hidden shadow-2xl">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/30 to-purple-500/30" />
-          
-          <div className="mb-10 text-center">
-             <h2 className="font-display font-black text-xl text-white/90 mb-2 uppercase tracking-[0.2em]">Secure Access</h2>
-             <div className="flex items-center justify-center gap-2 opacity-50">
-                <div className="w-1.5 h-1.5 rounded-full bg-success" />
-                <p className="font-mono text-[9px] text-steel uppercase tracking-widest font-bold">Terminal Online</p>
-             </div>
+      <div className="relative w-full max-w-[400px] animate-slide-up">
+        <div className="card p-10 bg-black/40 backdrop-blur-[60px] border border-white/10 rounded-[32px] shadow-2xl">
+          <div className="text-left mb-10">
+            <h1 className="font-display font-medium text-4xl text-white mb-2">Sign In</h1>
+            <p className="text-sm text-white/50">Keep it all together and you'll be fine</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Field label="Operator Identification">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="space-y-1">
+              <label className="text-[10px] text-white/40 uppercase tracking-widest px-0">Email or Phone</label>
               <input
-                className="input"
+                className="input-minimal"
                 type="email"
                 placeholder="operator@sifs.core"
                 value={form.email}
@@ -78,44 +70,51 @@ export default function LoginPage() {
                 required
                 autoFocus
               />
-            </Field>
+            </div>
 
-            <Field label="Security Keycode">
-              <div className="relative">
-                <input
-                  className="input pr-12"
-                  type={showPw ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={form.password}
-                  onChange={(e) => setForm(f => ({ ...f, password: e.target.value }))}
-                  required
-                />
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <label className="text-[10px] text-white/40 uppercase tracking-widest px-0">Password</label>
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-steel hover:text-white transition-colors"
+                  className="text-[10px] text-white/60 hover:text-white uppercase tracking-widest font-bold"
                   onClick={() => setShowPw(s => !s)}
                 >
-                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPw ? 'Hide' : 'Show'}
                 </button>
               </div>
-            </Field>
+              <input
+                className="input-minimal"
+                type={showPw ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={form.password}
+                onChange={(e) => setForm(f => ({ ...f, password: e.target.value }))}
+                required
+              />
+            </div>
 
-            <div className="pt-2 space-y-4">
+            <div className="pt-4 space-y-6">
               <button
                 type="submit"
-                className="btn-primary w-full py-3.5 !rounded-xl !text-[11px] font-black uppercase tracking-[0.2em]"
+                className="btn-purple"
                 disabled={loading}
               >
-                {loading ? 'Decrypting Access…' : 'Initialize Session'}
+                {loading ? 'Signing In…' : 'Sign In'}
               </button>
+
+              <div className="relative flex items-center justify-center">
+                <div className="absolute w-full h-[1px] bg-white/10" />
+                <span className="relative bg-[#050505]/0 px-4 text-[10px] text-white/40 uppercase tracking-[0.2em]">or</span>
+              </div>
 
               <button
                 type="button"
-                className="btn-ghost w-full py-3 !rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] border-white/5 hover:bg-white/5 active:scale-95"
+                className="btn-guest"
                 onClick={handleGuestLogin}
                 disabled={loading}
               >
-                Guest Protocol
+                <Activity size={18} className="text-white/60" />
+                <span className="text-sm">Login as Guest</span>
               </button>
             </div>
           </form>
