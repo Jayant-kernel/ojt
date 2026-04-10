@@ -4,10 +4,14 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 import pandas as pd
 from prophet import Prophet
+import traceback
+import logging
 
 from app.api.deps import get_db
 
 router = APIRouter(prefix="/forecasts", tags=["Forecasts"])
+
+logger = logging.getLogger(__name__)
 
 
 # ── GET /forecasts/products ───────────────────────────────────────────────────
@@ -37,7 +41,8 @@ async def get_forecast_products(db: Session = Depends(get_db)):
             for row in rows
         ]
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("get_forecast_products failed:\n%s", traceback.format_exc())
+        raise HTTPException(status_code=500, detail=traceback.format_exc())
 
 
 # ── POST /forecasts/generate ──────────────────────────────────────────────────
@@ -74,15 +79,24 @@ async def generate_forecast(body: Dict[str, Any], db: Session = Depends(get_db))
 
         # Build dataframe
         df = pd.DataFrame([{"ds": row.ds, "y": float(row.y)} for row in rows])
-        df["ds"] = pd.to_datetime(df["ds"])
+
+        # Strip timezone if present
+        df["ds"] = pd.to_datetime(df["ds"]).dt.tz_localize(None)
+
         df.dropna(inplace=True)
         df.sort_values("ds", inplace=True)
+        df.reset_index(drop=True, inplace=True)
+
+        # Replace zeros to avoid multiplicative seasonality crash
+        df["y"] = df["y"].clip(lower=0.01)
 
         if len(df) < 2:
             raise HTTPException(
                 status_code=400,
                 detail="Not enough data points to generate a forecast (need at least 2 weeks)"
             )
+
+        logger.info("Fitting Prophet for product_id=%s with %d rows", product_id, len(df))
 
         # Fit Prophet
         model = Prophet(
@@ -118,6 +132,11 @@ async def generate_forecast(body: Dict[str, Any], db: Session = Depends(get_db))
             ((merged["y"] - merged["yhat"]).abs() / merged["y"].replace(0, 1)).mean() * 100
         )
 
+        logger.info(
+            "Forecast complete for product_id=%s | MAE=%.4f RMSE=%.4f MAPE=%.4f",
+            product_id, mae, rmse, mape
+        )
+
         return {
             "status":        "completed",
             "model_name":    "prophet",
@@ -133,7 +152,8 @@ async def generate_forecast(body: Dict[str, Any], db: Session = Depends(get_db))
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("generate_forecast failed for product_id=%s:\n%s", product_id, traceback.format_exc())
+        raise HTTPException(status_code=500, detail=traceback.format_exc())
 
 
 # ── GET /forecasts/sales-history/{product_id} ─────────────────────────────────
@@ -150,4 +170,5 @@ async def get_sales_history(product_id: str, db: Session = Depends(get_db)):
 
         return [{"week": row.week, "sales": row.sales} for row in rows]
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("get_sales_history failed for product_id=%s:\n%s", product_id, traceback.format_exc())
+        raise HTTPException(status_code=500, detail=traceback.format_exc())
