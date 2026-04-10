@@ -1,282 +1,147 @@
 /**
- * Dashboard — KPI cards, sales trend chart, top products, recent alerts.
- * Redesigned to crypto staking aesthetic.
+ * Login — SIFS sign-in page.
+ * Matches the crypto/dark aesthetic from Dashboard.jsx.
  */
-import { useState, useEffect, useMemo } from 'react'
-import { Package, AlertTriangle, DollarSign, Wallet, TrendingUp, ChevronRight, Activity } from 'lucide-react'
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
-import { productsApi } from '../api/services'
-import { Spinner, EmptyState } from '../components/ui'
-import { format, subDays } from 'date-fns'
+import { useState } from 'react'
+import { Eye, EyeOff, User } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-// Mock sparkline data
-function generateSparkline(days = 7, baseline = 100, variance = 20) {
-  return Array.from({ length: days }, (_, i) => ({
-    date: format(subDays(new Date(), days - 1 - i), 'MMM dd'),
-    val: Math.max(0, baseline + (Math.random() - 0.5) * variance),
-  }))
-}
+export default function Login() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-export default function Dashboard() {
-  const [stats, setStats] = useState(null)
-  const [lowStock, setLowStock] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [timeRange, setTimeRange] = useState('24H')
-
-  useEffect(() => {
-    Promise.all([
-      productsApi.dashboardStats(),
-      productsApi.lowStock(),
-    ])
-      .then(([s, ls]) => {
-        setStats(s)
-        setLowStock(ls.slice(0, 5))
-      })
-      .catch(() => toast.error('Failed to load dashboard'))
-      .finally(() => setLoading(false))
-  }, [])
-
-  // Data for sparklines based on timeRange
-  const { sparkline1, sparkline2 } = useMemo(() => {
-    const points = timeRange === '24H' ? 6 : timeRange === '7D' ? 14 : 30
-    return {
-      sparkline1: generateSparkline(points, 50, 30),
-      sparkline2: generateSparkline(points, 20, 10)
+  const handleSignIn = async (e) => {
+    e.preventDefault()
+    if (!email || !password) {
+      toast.error('Please enter your email and password')
+      return
     }
-  }, [timeRange])
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Spinner size={32} />
-      </div>
-    )
+    setLoading(true)
+    try {
+      // TODO: replace with your real auth call e.g. await authApi.login({ email, password })
+      await new Promise((r) => setTimeout(r, 1000))
+      toast.success('Signed in successfully')
+    } catch {
+      toast.error('Invalid credentials. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const fmt = (n) => n?.toLocaleString() ?? '—'
-  const fmtCurrency = (n) => n != null ? `₹${n.toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '—'
-
-  const handleDismiss = (id) => {
-    setLowStock((prev) => prev.filter((item) => item.id !== id))
-    toast.success('Alert dismissed')
+  const handleGuest = async () => {
+    setLoading(true)
+    try {
+      // TODO: replace with your real guest auth call e.g. await authApi.loginAsGuest()
+      await new Promise((r) => setTimeout(r, 800))
+      toast.success('Continuing as guest')
+    } catch {
+      toast.error('Failed to continue as guest')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <div className="relative z-0">
-      {/* Ambient Glassmorphic Glows */}
+    <div className="min-h-screen flex items-center justify-center bg-[#111020] px-4 py-8">
+
+      {/* Ambient glows — matches Dashboard */}
       <div className="fixed top-[-10%] left-[10%] w-[500px] h-[500px] bg-primary-600/15 rounded-full blur-[140px] pointer-events-none -z-10 mix-blend-screen" />
       <div className="fixed bottom-[10%] right-[10%] w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[140px] pointer-events-none -z-10 mix-blend-screen" />
 
-      <div className="space-y-8 animate-fade-in max-w-[1200px] mx-auto pb-12 relative z-10">
+      <div className="w-full max-w-[900px] min-h-[480px] bg-[#1a1825] rounded-[18px] overflow-hidden grid grid-cols-1 md:grid-cols-2 border border-white/[0.08] animate-fade-in">
 
-        {/* Top Header Section */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/[0.05]">
-          <h1 className="font-display font-medium text-2xl text-white tracking-wide">Dashboard Overview</h1>
-          <div className="flex items-center gap-4">
-            <button className="btn-primary gap-2 shadow-[0_0_20px_rgba(169,85,255,0.15)]">
-              <Activity size={14} />
-              <span>Generate Report</span>
-            </button>
+        {/* ── Left panel ── */}
+        <div className="relative hidden md:flex flex-col justify-end p-8 overflow-hidden">
+          {/* bg layers */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#6b35c8] via-[#3a1e7a] to-[#1a0e3d] opacity-85" />
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute bottom-[30%] -left-[10%] w-[140%] h-[60%] bg-[rgba(40,20,80,0.7)] rounded-[60%_60%_0_0/40%_40%_0_0]" />
+            <div className="absolute bottom-[15%] -left-[5%] w-[120%] h-[50%] bg-[rgba(25,12,55,0.85)] rounded-[55%_55%_0_0/35%_35%_0_0]" />
+            <div className="absolute bottom-0 left-0 w-full h-[35%] bg-[rgba(15,8,35,0.95)] rounded-[45%_45%_0_0/25%_25%_0_0]" />
+          </div>
+
+          {/* Logo */}
+          <div className="absolute top-6 left-7 z-10 font-display font-bold text-white text-xl tracking-[3px]">
+            SIFS
+          </div>
+
+          {/* Tagline */}
+          <div className="relative z-10">
+            <h2 className="font-display font-medium text-white text-[22px] leading-snug">
+              Capturing Moments,<br />Creating Memories
+            </h2>
+            <div className="flex gap-1.5 mt-5">
+              <div className="h-[3px] w-6 rounded-full bg-white/35" />
+              <div className="h-[3px] w-6 rounded-full bg-white/35" />
+              <div className="h-[3px] w-8 rounded-full bg-white" />
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <h2 className="font-display font-semibold text-xl text-white">Top Inventory Metrics</h2>
-          <div className="flex bg-white/5 backdrop-blur-xl border border-white/10 rounded-full p-1 shadow-inner">
-            {['24H', '7D', '30D'].map((range) => (
+        {/* ── Right panel ── */}
+        <div className="flex flex-col justify-center px-8 py-10 md:px-9">
+
+          <h1 className="font-display font-medium text-white text-[28px] mb-1 tracking-tight">
+            Welcome back
+          </h1>
+          <p className="text-[13px] text-steel-400 mb-8">
+            Sign in to your account to continue
+          </p>
+
+          <form onSubmit={handleSignIn} className="flex flex-col gap-3 mb-6">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-white/[0.06] border border-white/10 rounded-[10px] px-4 py-3 text-white text-sm placeholder:text-white/30 outline-none focus:border-primary-400/55 transition-colors font-mono"
+            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-white/[0.06] border border-white/10 rounded-[10px] px-4 py-3 pr-11 text-white text-sm placeholder:text-white/30 outline-none focus:border-primary-400/55 transition-colors font-mono"
+              />
               <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`px-5 py-2 rounded-full font-mono text-xs transition-all duration-300 ${
-                  timeRange === range
-                    ? 'bg-white/10 text-white shadow-lg scale-105 border border-white/10'
-                    : 'text-steel-400 hover:text-white hover:bg-white/5'
-                }`}
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
               >
-                {range}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Crypto-Style KPI Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          {/* Card 1 — Total Products */}
-          <div
-            className="card p-5 h-full flex flex-col relative overflow-hidden group bg-[rgba(60,100,220,0.1)] hover:![background:rgba(60,100,220,0.15)] hover:!border-[rgba(120,180,255,0.5)] hover:!shadow-[0_0_40px_rgba(60,100,220,0.25)]"
-            style={{ borderTop: '1px solid rgba(120,180,255,0.4)' }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/30 shadow-[0_0_15px_rgba(100,160,255,0.2)]">
-                <Package size={14} className="text-blue-400" />
-              </div>
-              <div>
-                <div className="text-[10px] font-mono text-steel uppercase tracking-[0.2em]">Total Products</div>
-              </div>
-            </div>
-            <div className="flex items-end justify-between z-10 relative mt-auto">
-              <div>
-                <div className="font-display font-medium text-4xl text-white mb-2 tracking-tight">{fmt(stats?.total_products)}</div>
-                <div className="text-[10px] font-mono text-success flex items-center gap-1.5">
-                  <span className="px-1.5 py-0.5 rounded bg-success/10 border border-success/20">+4.2%</span>
-                  <TrendingUp size={12} />
-                </div>
-              </div>
-              <div className="w-28 h-12">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={sparkline1}>
-                    <defs>
-                      <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#60A5FA" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#60A5FA" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <Tooltip cursor={false} content={<></>} />
-                    <Area type="monotone" dataKey="val" stroke="#60A5FA" strokeWidth={2} fill="url(#g1)" dot={false} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2 — Low Stock Alert */}
-          <div
-            className="card p-5 h-full flex flex-col relative overflow-hidden bg-[rgba(200,140,30,0.08)] hover:![background:rgba(200,140,30,0.12)] hover:!border-warning/30 hover:!shadow-[0_0_30px_rgba(245,158,11,0.15)]"
-            style={{ borderTop: '1px solid rgba(245,158,11,0.4)' }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded-xl bg-warning/10 flex items-center justify-center border border-warning/30 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-                <AlertTriangle size={14} className="text-warning" />
-              </div>
-              <div>
-                <div className="text-[10px] font-mono text-steel uppercase tracking-[0.2em]">Low Stock Alert</div>
-              </div>
-            </div>
-            <div className="flex items-end justify-between z-10 relative mt-auto">
-              <div>
-                <div className="font-display font-medium text-4xl text-white mb-2 tracking-tight">{fmt(stats?.low_stock_count)}</div>
-                <div className="text-[10px] font-mono text-danger flex items-center gap-1.5">
-                  <span className="px-1.5 py-0.5 rounded bg-danger/10 border border-danger/20">-1.5%</span>
-                  <TrendingUp size={12} className="rotate-180" />
-                </div>
-              </div>
-              <div className="w-28 h-12">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={sparkline2}>
-                    <defs>
-                      <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <Tooltip cursor={false} content={<></>} />
-                    <Area type="monotone" dataKey="val" stroke="#F59E0B" strokeWidth={2} fill="url(#g2)" dot={false} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3 — Inventory Value */}
-          <div
-            className="card p-5 h-full flex flex-col relative overflow-hidden bg-[rgba(100,50,200,0.12)] shadow-2xl hover:![background:rgba(100,50,200,0.2)] hover:!border-[rgba(160,120,255,0.5)]"
-            style={{ borderTop: '1px solid rgba(160,120,255,0.4)' }}
-          >
-            <div className="absolute -top-16 -right-16 w-32 h-32 bg-purple-500 rounded-full blur-[80px] opacity-20" />
-
-            <div className="relative z-10 flex flex-col h-full justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display text-sm font-bold text-white tracking-wide">Inventory Value</h3>
-                  <div className="bg-white/10 px-2.5 py-0.5 rounded text-[8px] uppercase font-mono font-black text-white border border-white/10">Active Audit</div>
-                </div>
-                <div className="font-display font-black text-3xl text-white mb-5 drop-shadow-2xl mt-1">
-                  {fmtCurrency(stats?.total_inventory_value)}
-                </div>
-              </div>
-              <button className="w-full btn-primary gap-2 !py-2.5 mt-auto">
-                <span className="font-mono text-[10px] font-black tracking-widest uppercase">Inspect Portfolio</span>
-                <ChevronRight size={14} />
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full !py-3 mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Signing in…' : 'Sign in'}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-[12px] font-mono text-white/28 whitespace-nowrap">Or continue as</span>
+            <div className="flex-1 h-px bg-white/10" />
           </div>
 
+          {/* Guest */}
+          <button
+            onClick={handleGuest}
+            disabled={loading}
+            className="btn-ghost w-full !py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <User size={15} className="opacity-60" />
+            <span className="font-mono text-[13px]">Continue as guest</span>
+          </button>
+
         </div>
-
-        {/* Lower Section: Action Needed */}
-        <div className="mt-12 group/table">
-          <h2 className="font-display font-bold text-2xl text-white mb-8 tracking-tight flex items-center gap-3">
-            <div className="w-1.5 h-8 bg-purple-500 rounded-full shadow-[0_0_15px_rgba(169,85,255,0.5)]" />
-            Action Needed
-          </h2>
-
-          <div className="card overflow-hidden">
-            {lowStock.length === 0 ? (
-              <div className="p-12"><EmptyState icon={Package} message="All systems nominal. No stock alerts detected." /></div>
-            ) : (
-              <div>
-                <div className="list-header hidden md:flex border-b border-white/10 bg-white/[0.02] px-8 py-5">
-                  <div className="w-[35%] px-4">Asset Detail</div>
-                  <div className="w-[15%] px-4 text-right font-bold uppercase">Stock</div>
-                  <div className="w-[15%] px-4 text-right font-bold uppercase">Threshold</div>
-                  <div className="w-[20%] px-4 text-center font-bold uppercase">Status</div>
-                  <div className="w-[15%] px-4 text-right font-bold uppercase">Directives</div>
-                </div>
-
-                <div className="divide-y divide-white/[0.03]">
-                  {lowStock.map((p) => (
-                    <div key={p.id} className="list-row flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-0 px-8 py-6 hover:bg-white/[0.03] transition-colors relative group/row">
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover/row:scale-y-100 transition-transform origin-top" />
-
-                      <div className="w-full md:w-[35%] flex items-center gap-5 px-4">
-                        <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center border border-white/10 shrink-0 shadow-inner group-hover/row:border-primary/20 transition-colors">
-                          <Package size={20} className="text-steel group-hover/row:text-primary transition-colors" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-display font-bold text-white text-base mb-1 truncate">{p.name}</div>
-                          <div className="text-[10px] font-mono text-steel uppercase tracking-[0.2em] font-medium">Ref: {p.sku}</div>
-                        </div>
-                      </div>
-
-                      <div className="w-full md:w-[15%] md:text-right font-display text-2xl font-black text-white px-4">
-                        {p.current_stock}
-                      </div>
-
-                      <div className="w-full md:w-[15%] md:text-right text-steel font-mono text-xs uppercase tracking-widest px-4 font-bold">
-                        {p.reorder_point ?? '—'}
-                      </div>
-
-                      <div className="w-full md:w-[20%] md:text-center px-4">
-                        {p.current_stock === 0
-                          ? <span className="badge-danger w-full text-center">CRITICAL: EMPTY</span>
-                          : <span className="badge-warning w-full text-center">WARNING: LOW</span>
-                        }
-                      </div>
-
-                      <div className="w-full md:w-[15%] flex justify-start md:justify-end gap-2 px-4">
-                        <button className="btn-primary !px-3 !py-2 text-[10px] flex-1">
-                          Refill
-                        </button>
-                        <button
-                          onClick={() => handleDismiss(p.id)}
-                          className="btn-ghost !px-3 !py-2 text-[10px] text-steel/60 hover:text-white flex-1"
-                        >
-                          Ignore
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
       </div>
     </div>
   )
