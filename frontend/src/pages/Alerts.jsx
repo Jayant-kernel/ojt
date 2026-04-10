@@ -108,19 +108,30 @@ export default function Alerts() {
             </thead>
             <tbody>
               {sorted.map((p) => {
-                const reorder = p.reorder_point ?? 10
+                const reorder = p.reorder_point
                 const deficit = reorder - p.current_stock
                 return (
                   <tr key={p.id} className="table-row">
                     <td className="table-cell text-white font-display font-semibold text-xs">{p.name}</td>
                     <td className="table-cell text-amber-400">{p.sku}</td>
                     <td className="table-cell text-right">
-                      <span className={p.current_stock === 0 ? 'text-red-400 font-bold' : p.current_stock <= 5 ? 'text-amber-400 font-bold' : 'text-steel-300'}>
+                      <span className={
+                        p.current_stock === 0
+                          ? 'text-red-400 font-bold'
+                          : p.current_stock <= 5
+                            ? 'text-amber-400 font-bold'
+                            : 'text-steel-300'
+                      }>
                         {p.current_stock}
                       </span>
                     </td>
                     <td className="table-cell text-right text-steel-400">{reorder}</td>
-                    <td className="table-cell text-right text-red-400">−{deficit}</td>
+                    <td className="table-cell text-right">
+                      {deficit > 0
+                        ? <span className="text-red-400">−{deficit}</span>
+                        : <span className="text-steel-500">—</span>
+                      }
+                    </td>
                     <td className="table-cell text-center">
                       <StockBadge stock={p.current_stock} reorderPoint={reorder} />
                     </td>
