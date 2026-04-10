@@ -539,15 +539,20 @@ export default function Forecast() {
                 />
                 <KpiCard
                   label="Avg Stock"
-                  value={(dataset.reduce((a, b) => a + (b.current_stock ?? 0), 0) / dataset.length).toFixed(1)}
-                  sub="Units per product"
+                  value={(() => {
+  const avg = dataset.reduce((a, b) => a + (parseFloat(b.current_stock) || 0), 0) / dataset.length
+  return isNaN(avg) ? '—' : avg.toFixed(1)
+})()} sub="Units per product"
                   icon={Layers}
                   delay={50}
                 />
                 <KpiCard
                   label="Avg Price"
-                  value={`₹${(dataset.reduce((a, b) => a + (b.selling_price ?? 0), 0) / dataset.length).toFixed(2)}`}
-                  sub="Selling price avg"
+                 value={(() => {
+  const avg = dataset.reduce((a, b) => a + (parseFloat(b.selling_price) || 0), 0) / dataset.length
+  return isNaN(avg) ? '—' : `₹${avg.toFixed(2)}`
+})()}
+ sub="Selling price avg"
                   icon={BarChart2}
                   accent
                   delay={100}
@@ -675,7 +680,7 @@ export default function Forecast() {
                           </td>
                           <td className="table-cell text-steel-400">{item.category}</td>
                           <td className="table-cell text-right text-green-400">
-                            ₹{item.selling_price?.toFixed(2) ?? '—'}
+                            ₹{item.selling_price != null ? parseFloat(item.selling_price).toFixed(2) : '—' ?? '—'}
                           </td>
                           <td className="table-cell text-right font-mono">{item.current_stock}</td>
                           <td className="table-cell text-right font-mono text-red-400">{item.reorder_point}</td>
