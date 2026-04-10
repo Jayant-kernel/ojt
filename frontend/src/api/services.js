@@ -96,21 +96,15 @@ export const salesApi = {
 // ── Forecasts ─────────────────────────────────────────────────────────────────
 
 export const forecastsApi = {
-  // GET /api/products — returns all products for the dropdown
-  // Expected shape: [{ id, sku, name, category }]
- getProducts: () =>
-  api.get('/products').then(r => {
-    console.log('products response:', r.data)  // <-- add this
-    return r.data
-  })
-  // POST /api/forecasts/generate
-  // Body: { product_id, horizon_days }
-  // Expected shape: { status, model_name, horizon_days, forecast_from, forecast_to,
-  //                   mae, rmse, mape, predictions: [{ ds, yhat, yhat_lower, yhat_upper }] }
+  getProducts: () =>
+    api.get('/products').then(r => {
+      console.log('products response:', r.data)  // no comma after this
+      return Array.isArray(r.data) ? r.data : r.data.data ?? r.data.products ?? []
+    }),
+
   generate: (productId, horizonDays) =>
     api.post('/forecasts/generate', { product_id: productId, horizon_days: horizonDays }).then(r => r.data),
 }
- 
 // ─── inventoryApi ─────────────────────────────────────────────────────────────
  
 export const inventoryApi = {
