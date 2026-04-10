@@ -97,10 +97,10 @@ export const salesApi = {
 
 export const forecastsApi = {
   getProducts: () =>
-    api.get('/products').then(r => {
-      console.log('products response:', r.data)  // no comma after this
-      return Array.isArray(r.data) ? r.data : r.data.data ?? r.data.products ?? []
-    }),
+    api.get('/products', { params: { page_size: 500 } }).then(r => {
+      console.log('products response:', r.data)
+      return Array.isArray(r.data) ? r.data : r.data.items ?? []
+  }),
 
   generate: (productId, horizonDays) =>
     api.post('/forecasts/generate', { product_id: productId, horizon_days: horizonDays }).then(r => r.data),
@@ -111,8 +111,9 @@ export const inventoryApi = {
   // GET /api/products — with full inventory fields
   // Expected shape: [{ sku, name, category, selling_price, current_stock, reorder_point }]
   getDataset: () =>
-    api.get('/products').then(r => r.data),
  
+  api.get('/products', { params: { page_size: 500 } }).then(r =>
+    Array.isArray(r.data) ? r.data : r.data.items ?? [],
   // GET /api/sales-history/:productId
   // Expected shape: [{ week: '2025-W03', sales: 214 }, ...]
   // week comes from year_week column in sales_history table
