@@ -96,22 +96,41 @@ export const salesApi = {
 // ── Forecasts ─────────────────────────────────────────────────────────────────
 export const forecastsApi = {
   getProducts: () =>
-    api.get('/products', { params: { page_size: 500 } }).then(r =>
-      Array.isArray(r.data) ? r.data : r.data.items ?? []
-    ),
+    api.get('/products', { params: { page: 1, page_size: 100 } }).then(async r => {
+      const first = Array.isArray(r.data) ? r.data : r.data.items ?? []
+      const total = r.data.pages ?? 1
+      if (total <= 1) return first
+
+      // Fetch remaining pages in parallel
+      const rest = await Promise.all(
+        Array.from({ length: total - 1 }, (_, i) =>
+          api.get('/products', { params: { page: i + 2, page_size: 100 } })
+            .then(r => r.data.items ?? [])
+        )
+      )
+      return [...first, ...rest.flat()]
+    }),
 
   generate: (productId, horizonDays) =>
     api.post('/forecasts/generate', { product_id: productId, horizon_days: horizonDays }).then(r => r.data),
 }
 
-// ── Inventory ─────────────────────────────────────────────────────────────────
 export const inventoryApi = {
   getDataset: () =>
-    api.get('/products', { params: { page_size: 500 } }).then(r =>
-      Array.isArray(r.data) ? r.data : r.data.items ?? []
-    ),
+    api.get('/products', { params: { page: 1, page_size: 100 } }).then(async r => {
+      const first = Array.isArray(r.data) ? r.data : r.data.items ?? []
+      const total = r.data.pages ?? 1
+      if (total <= 1) return first
+
+      const rest = await Promise.all(
+        Array.from({ length: total - 1 }, (_, i) =>
+          api.get('/products', { params: { page: i + 2, page_size: 100 } })
+            .then(r => r.data.items ?? [])
+        )
+      )
+      return [...first, ...rest.flat()]
+    }),
 
   getProductSales: (productId) =>
     api.get(`/sales-history/${productId}`).then(r => r.data),
 }
- 
