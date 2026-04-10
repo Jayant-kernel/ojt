@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 # ── GET /forecasts/products ───────────────────────────────────────────────────
 @router.get("/products")
 async def get_forecast_products(db: AsyncSession = Depends(get_db)):
-    """Distinct product IDs from sales_history joined with products table."""
+    """Distinct products that have sales history — used by the forecast selector."""
     try:
         result = await db.execute(text("""
             SELECT DISTINCT
@@ -46,6 +46,50 @@ async def get_forecast_products(db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=500, detail=traceback.format_exc())
 
 
+# ── GET /forecasts/dataset ────────────────────────────────────────────────────
+@router.get("/dataset")
+async def get_dataset(db: AsyncSession = Depends(get_db)):
+    """All active products with category name — used by the Dataset View tab."""
+    try:
+        result = await db.execute(text("""
+            SELECT
+                p.id,
+                p.sku,
+                p.name,
+                COALESCE(c.name, 'Uncategorized') AS category,
+                CAST(p.selling_price  AS FLOAT) AS selling_price,
+                CAST(p.cost_price     AS FLOAT) AS cost_price,
+                p.current_stock,
+                p.reorder_point,
+                p.reorder_quantity,
+                p.max_stock
+            FROM products p
+            LEFT JOIN categories c ON c.id = p.category_id
+            WHERE p.is_active = true
+            ORDER BY p.name ASC
+        """))
+        rows = result.fetchall()
+
+        return [
+            {
+                "id":               str(row.id),
+                "sku":              row.sku,
+                "name":             row.name,
+                "category":         row.category,
+                "selling_price":    row.selling_price,
+                "cost_price":       row.cost_price,
+                "current_stock":    row.current_stock,
+                "reorder_point":    row.reorder_point,
+                "reorder_quantity": row.reorder_quantity,
+                "max_stock":        row.max_stock,
+            }
+            for row in rows
+        ]
+    except Exception as e:
+        logger.error("get_dataset failed:\n%s", traceback.format_exc())
+        raise HTTPException(status_code=500, detail=traceback.format_exc())
+
+
 # ── POST /forecasts/generate ──────────────────────────────────────────────────
 @router.post("/generate")
 async def generate_forecast(body: Dict[str, Any], db: AsyncSession = Depends(get_db)):
@@ -56,7 +100,6 @@ async def generate_forecast(body: Dict[str, Any], db: AsyncSession = Depends(get
         raise HTTPException(status_code=400, detail="product_id is required")
 
     try:
-        # Look up the SKU for this product UUID
         result = await db.execute(text("""
             SELECT sku, name FROM products WHERE id = :pid
         """), {"pid": product_id})
@@ -65,7 +108,6 @@ async def generate_forecast(body: Dict[str, Any], db: AsyncSession = Depends(get
         if not product:
             raise HTTPException(status_code=404, detail="Product not found")
 
-        # Fetch weekly sales from sales_history using SKU
         result = await db.execute(text("""
             SELECT week_start_date AS ds, sales AS y
             FROM sales_history
@@ -80,17 +122,11 @@ async def generate_forecast(body: Dict[str, Any], db: AsyncSession = Depends(get
                 detail=f"No sales history found for product: {product.name}"
             )
 
-        # Build dataframe
         df = pd.DataFrame([{"ds": row.ds, "y": float(row.y)} for row in rows])
-
-        # Strip timezone if present
         df["ds"] = pd.to_datetime(df["ds"]).dt.tz_localize(None)
-
         df.dropna(inplace=True)
         df.sort_values("ds", inplace=True)
         df.reset_index(drop=True, inplace=True)
-
-        # Replace zeros to avoid multiplicative seasonality crash
         df["y"] = df["y"].clip(lower=0.01)
 
         if len(df) < 2:
@@ -101,7 +137,6 @@ async def generate_forecast(body: Dict[str, Any], db: AsyncSession = Depends(get
 
         logger.info("Fitting Prophet for product_id=%s with %d rows", product_id, len(df))
 
-        # Fit Prophet
         model = Prophet(
             yearly_seasonality=True,
             weekly_seasonality=True,
@@ -113,7 +148,6 @@ async def generate_forecast(body: Dict[str, Any], db: AsyncSession = Depends(get
         future   = model.make_future_dataframe(periods=horizon, freq="D")
         forecast = model.predict(future)
 
-        # Only return future predictions (beyond training data)
         future_only = forecast[forecast["ds"] > df["ds"].max()]
 
         predictions = [
@@ -126,7 +160,6 @@ async def generate_forecast(body: Dict[str, Any], db: AsyncSession = Depends(get
             for _, row in future_only.iterrows()
         ]
 
-        # Compute metrics on historical fit
         hist   = forecast[forecast["ds"] <= df["ds"].max()].copy()
         merged = df.merge(hist[["ds", "yhat"]], on="ds", how="inner")
         mae  = float((merged["y"] - merged["yhat"]).abs().mean())
@@ -159,7 +192,7 @@ async def generate_forecast(body: Dict[str, Any], db: AsyncSession = Depends(get
         raise HTTPException(status_code=500, detail=traceback.format_exc())
 
 
-# ── GET /forecasts/sales-history/{product_id} ─────────────────────────────────
+# ── GET /forecasts/sales-history/{product_id} ────────────────────────────────
 @router.get("/sales-history/{product_id}")
 async def get_sales_history(product_id: str, db: AsyncSession = Depends(get_db)):
     """Weekly sales history for a product SKU — used by the modal chart."""

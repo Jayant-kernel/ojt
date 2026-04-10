@@ -96,41 +96,19 @@ export const salesApi = {
 // ── Forecasts ─────────────────────────────────────────────────────────────────
 export const forecastsApi = {
   getProducts: () =>
-    api.get('/products', { params: { page: 1, page_size: 100 } }).then(async r => {
-      const first = Array.isArray(r.data) ? r.data : r.data.items ?? []
-      const total = r.data.pages ?? 1
-      if (total <= 1) return first
-
-      // Fetch remaining pages in parallel
-      const rest = await Promise.all(
-        Array.from({ length: total - 1 }, (_, i) =>
-          api.get('/products', { params: { page: i + 2, page_size: 100 } })
-            .then(r => r.data.items ?? [])
-        )
-      )
-      return [...first, ...rest.flat()]
-    }),
+    api.get('/forecasts/products').then(r => r.data),
 
   generate: (productId, horizonDays) =>
     api.post('/forecasts/generate', { product_id: productId, horizon_days: horizonDays }).then(r => r.data),
 }
 
+// ── Inventory / Dataset ───────────────────────────────────────────────────────
 export const inventoryApi = {
+  // Fetches all products with category from the DB via the dedicated dataset endpoint
   getDataset: () =>
-    api.get('/products', { params: { page: 1, page_size: 100 } }).then(async r => {
-      const first = Array.isArray(r.data) ? r.data : r.data.items ?? []
-      const total = r.data.pages ?? 1
-      if (total <= 1) return first
+    api.get('/forecasts/dataset').then(r => r.data),
 
-      const rest = await Promise.all(
-        Array.from({ length: total - 1 }, (_, i) =>
-          api.get('/products', { params: { page: i + 2, page_size: 100 } })
-            .then(r => r.data.items ?? [])
-        )
-      )
-      return [...first, ...rest.flat()]
-    }),
-
-  getProductSales: (productId) =>
-    api.get(`/sales-history/${productId}`).then(r => r.data),
+  // Fetches weekly sales history for a product SKU
+  getProductSales: (sku) =>
+    api.get(`/forecasts/sales-history/${sku}`).then(r => r.data),
 }
