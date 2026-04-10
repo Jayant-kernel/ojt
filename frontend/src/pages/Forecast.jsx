@@ -44,10 +44,8 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
       return
     }
     setLoading(true)
-    // product.sku is the product_id stored in sales_history
     inventoryApi.getProductSales(product.sku)
       .then(data => {
-        // API should return [{ week: '2025-W03', sales: 214 }, ...]
         setSales(data)
         if (data.length > 0) {
           setRange({ startIndex: 0, endIndex: Math.min(11, data.length - 1) })
@@ -79,9 +77,9 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
 
   if (!isOpen) return null
 
-  const peakValue   = sales.length > 0 ? Math.max(...sales.map(s => s.sales)) : 0
-  const totalSales  = sales.reduce((acc, curr) => acc + curr.sales, 0)
-  const avgSales    = sales.length > 0 ? (totalSales / sales.length).toFixed(1) : '0'
+  const peakValue  = sales.length > 0 ? Math.max(...sales.map(s => s.sales)) : 0
+  const totalSales = sales.reduce((acc, curr) => acc + curr.sales, 0)
+  const avgSales   = sales.length > 0 ? (totalSales / sales.length).toFixed(1) : '0'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-md animate-fade-in shadow-2xl">
@@ -110,10 +108,7 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
             </div>
           ) : sales.length > 0 ? (
             <div className="space-y-6">
-              <div
-                className="h-[400px] w-full relative group"
-                onWheel={handleWheel}
-              >
+              <div className="h-[400px] w-full relative group" onWheel={handleWheel}>
                 {/* Nav buttons */}
                 <div className="absolute inset-y-0 left-0 flex items-center z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
@@ -181,10 +176,10 @@ const ProductSalesModal = ({ product, isOpen, onClose }) => {
 
               {/* KPIs */}
               <div className="grid grid-cols-4 gap-4">
-                <KpiCard label="Peak Week"   value={peakValue}   sub="Highest units sold"  icon={TrendingUp} delay={0}   />
-                <KpiCard label="Average"     value={avgSales}    sub="Units per week"       icon={Layers}     delay={50}  />
-                <KpiCard label="Total Sales" value={totalSales}  sub="Total units sold"     icon={Database}   accent delay={100} />
-                <KpiCard label="Weeks"       value={sales.length} sub="Data points"         icon={BarChart2}  delay={150} />
+                <KpiCard label="Peak Week"   value={peakValue}    sub="Highest units sold" icon={TrendingUp} delay={0}   />
+                <KpiCard label="Average"     value={avgSales}     sub="Units per week"      icon={Layers}    delay={50}  />
+                <KpiCard label="Total Sales" value={totalSales}   sub="Total units sold"    icon={Database}  accent delay={100} />
+                <KpiCard label="Weeks"       value={sales.length} sub="Data points"         icon={BarChart2} delay={150} />
               </div>
             </div>
           ) : (
@@ -212,16 +207,15 @@ export default function Forecast() {
   const [loading, setLoading]     = useState(false)
   const [forecast, setForecast]   = useState(null)
 
-  const [mode, setMode]                 = useState('forecast') // 'forecast' | 'dataset'
+  const [mode, setMode]                 = useState('forecast')
   const [dataset, setDataset]           = useState([])
   const [activeMetric, setActiveMetric] = useState('current_stock')
 
   const [selectedProductForModal, setSelectedProductForModal] = useState(null)
-  const [isModalOpen, setIsModalOpen]   = useState(false)
-  const [showAllRows, setShowAllRows]   = useState(false)
+  const [isModalOpen, setIsModalOpen]     = useState(false)
+  const [showAllRows, setShowAllRows]     = useState(false)
   const [productSearch, setProductSearch] = useState('')
 
-  // Filter products list by search
   const filteredProducts = useMemo(() => {
     if (!productSearch.trim()) return products
     const s = productSearch.toLowerCase()
@@ -231,14 +225,12 @@ export default function Forecast() {
     )
   }, [products, productSearch])
 
-  // Load products on mount
   useEffect(() => {
     forecastsApi.getProducts()
       .then(d => setProducts(d))
       .catch(() => toast.error('Failed to load products'))
   }, [])
 
-  // Load dataset when switching to dataset mode
   useEffect(() => {
     if (mode === 'dataset' && dataset.length === 0) {
       loadDataset()
@@ -274,17 +266,16 @@ export default function Forecast() {
     }
   }
 
-  // Demo forecast fallback when backend isn't ready
   function generateDemoForecast(days) {
     const predictions = Array.from({ length: days }, (_, i) => {
       const base  = 50 + Math.sin(i / 7) * 20 + (i / days) * 30
       const noise = (Math.random() - 0.5) * 10
       const yhat  = Math.max(0, base + noise)
       return {
-        ds:          new Date(Date.now() + i * 86400000).toISOString().slice(0, 10),
-        yhat:        parseFloat(yhat.toFixed(1)),
-        yhat_lower:  parseFloat(Math.max(0, yhat - 15).toFixed(1)),
-        yhat_upper:  parseFloat((yhat + 15).toFixed(1)),
+        ds:         new Date(Date.now() + i * 86400000).toISOString().slice(0, 10),
+        yhat:       parseFloat(yhat.toFixed(1)),
+        yhat_lower: parseFloat(Math.max(0, yhat - 15).toFixed(1)),
+        yhat_upper: parseFloat((yhat + 15).toFixed(1)),
       }
     })
     return {
@@ -300,7 +291,6 @@ export default function Forecast() {
     }
   }
 
-  // Downsample chart points for readability
   const chartData = forecast?.predictions
     ?.filter((_, i) => i % 2 === 0)
     ?.map(p => ({
@@ -350,7 +340,6 @@ export default function Forecast() {
         <>
           <SectionCard title="Generate Forecast">
             <div className="flex flex-wrap items-end gap-4">
-              {/* Search */}
               <div className="flex-1 min-w-48">
                 <Field label="Product Search">
                   <div className="relative">
@@ -366,7 +355,6 @@ export default function Forecast() {
                 </Field>
               </div>
 
-              {/* Product select */}
               <div className="flex-1 min-w-48">
                 <Field label="Select Product">
                   <select className="input" value={productId} onChange={(e) => setProductId(e.target.value)}>
@@ -380,7 +368,6 @@ export default function Forecast() {
                 </Field>
               </div>
 
-              {/* Horizon */}
               <div className="w-36">
                 <Field label="Horizon (days)">
                   <select className="input" value={horizon} onChange={(e) => setHorizon(e.target.value)}>
@@ -426,20 +413,24 @@ export default function Forecast() {
               {/* Metrics */}
               {(forecast.mae || forecast.rmse || forecast.mape) && (
                 <div className="grid grid-cols-3 gap-4">
-                  <KpiCard label="MAE"  value={forecast.mae?.toFixed(2)  ?? '—'} sub="Mean Absolute Error"    icon={BarChart2} delay={0}   />
-                  <KpiCard label="RMSE" value={forecast.rmse?.toFixed(2) ?? '—'} sub="Root Mean Sq. Error"    icon={BarChart2} delay={50}  />
+                  <KpiCard label="MAE"  value={forecast.mae?.toFixed(2)  ?? '—'} sub="Mean Absolute Error"  icon={BarChart2} delay={0}   />
+                  <KpiCard label="RMSE" value={forecast.rmse?.toFixed(2) ?? '—'} sub="Root Mean Sq. Error"  icon={BarChart2} delay={50}  />
                   <KpiCard label="MAPE" value={forecast.mape ? `${forecast.mape.toFixed(1)}%` : '—'} sub="Mean Abs. % Error" icon={BarChart2} accent delay={100} />
                 </div>
               )}
 
-              {/* Forecast chart */}
+              {/* ── Forecast chart ── */}
               <SectionCard title="Predicted Demand">
                 <ResponsiveContainer width="100%" height={320}>
                   <ComposedChart data={chartData} margin={{ top: 10, right: 10, bottom: 0, left: 0 }}>
                     <defs>
-                      <linearGradient id="forecastBand" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#2596be" stopOpacity={0.15} />
-                        <stop offset="95%" stopColor="#2596be" stopOpacity={0.02} />
+                      <linearGradient id="upperBand" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor="#a78bfa" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#a78bfa" stopOpacity={0.05} />
+                      </linearGradient>
+                      <linearGradient id="lowerBand" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor="#34d399" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#34d399" stopOpacity={0.05} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1E2533" vertical={false} />
@@ -461,18 +452,38 @@ export default function Forecast() {
                       iconSize={8}
                       wrapperStyle={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#94A3B8' }}
                     />
-                    {/* Confidence band — upper then lower to sandwich the fill */}
-                    <Area dataKey="upper" name="Upper CI" stroke="none" fill="url(#forecastBand)" legendType="none" />
-                    <Area dataKey="lower" name="Lower CI" stroke="none" fill="#080A0E"            legendType="none" />
-                    {/* Forecast line */}
+
+                    {/* Upper CI — purple dashed */}
+                    <Area
+                      dataKey="upper"
+                      name="Upper CI"
+                      stroke="#a78bfa"
+                      strokeWidth={1.5}
+                      strokeDasharray="4 3"
+                      fill="url(#upperBand)"
+                      dot={false}
+                      activeDot={{ r: 3, fill: '#a78bfa' }}
+                    />
+                    {/* Lower CI — green dashed */}
+                    <Area
+                      dataKey="lower"
+                      name="Lower CI"
+                      stroke="#34d399"
+                      strokeWidth={1.5}
+                      strokeDasharray="4 3"
+                      fill="url(#lowerBand)"
+                      dot={false}
+                      activeDot={{ r: 3, fill: '#34d399' }}
+                    />
+                    {/* Forecast — solid cyan, thicker */}
                     <Line
                       type="monotone"
                       dataKey="forecast"
                       name="Forecast"
-                      stroke="#2596be"
-                      strokeWidth={2}
+                      stroke="#38bdf8"
+                      strokeWidth={2.5}
                       dot={false}
-                      activeDot={{ r: 4, fill: '#2596be' }}
+                      activeDot={{ r: 4, fill: '#38bdf8' }}
                     />
                   </ComposedChart>
                 </ResponsiveContainer>
@@ -628,7 +639,7 @@ export default function Forecast() {
                 </p>
               </SectionCard>
 
-              {/* Dataset table — click row → open sales modal */}
+              {/* Dataset table */}
               <SectionCard title="Dataset Detail">
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -648,7 +659,6 @@ export default function Forecast() {
                           key={i}
                           className="table-row cursor-pointer hover:bg-white/5 group transition-all"
                           onClick={() => {
-                            // item must have: sku, name, category
                             setSelectedProductForModal(item)
                             setIsModalOpen(true)
                           }}
